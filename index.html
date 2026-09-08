@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitácora — Operaciones Comerciales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12161d;
+    --rail:#1b222d;
+    --rail-hover:#242e3c;
+    --paper:#e9e2cf;
+    --paper-2:#f2ecdd;
+    --ink:#1c1a14;
+    --ink-soft:#5a5648;
+    --line:#c9bfa0;
+    --accent:#d6a84a;
+    --accent-ink:#3a2c0c;
+    --sage:#6e9887;
+    --danger:#b4544a;
+    --success:#587e56;
+    --muted:#8b93a3;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;padding:0;}
+  html,body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-feature-settings:"tnum" 1;
+    height:100%;
+  }
+  #app{display:flex;min-height:100vh;}
+
+  /* ---- Rail ---- */
+  .rail{
+    width:216px;
+    flex-shrink:0;
+    background:var(--rail);
+    padding:22px 0;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .rail-brand{
+    font-family:'Roboto Slab',serif;
+    color:var(--paper);
+    font-size:17px;
+    font-weight:700;
+    padding:0 20px 20px 20px;
+    border-bottom:1px solid #2b3341;
+    margin-bottom:10px;
+    letter-spacing:.2px;
+  }
+  .rail-brand small{
+    display:block;
+    font-family:'Inter',sans-serif;
+    font-weight:400;
+    font-size:11px;
+    color:var(--muted);
+    margin-top:3px;
+  }
+  .tab{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:11px 20px;
+    color:#c4cad6;
+    cursor:pointer;
+    font-size:13.5px;
+    font-weight:500;
+    border-left:3px solid transparent;
+    transition:background .12s;
+  }
+  .tab:hover{background:var(--rail-hover);}
+  .tab.active{
+    background:var(--rail-hover);
+    border-left:3px solid var(--accent);
+    color:var(--paper-2);
+  }
+  .tab .mono-ico{
+    width:22px;height:22px;border-radius:5px;
+    background:#2b3341;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;color:var(--accent);
+    font-family:'Roboto Slab',serif;
+    flex-shrink:0;
+  }
+  .rail-foot{
+    margin-top:auto;
+    padding:14px 20px 0 20px;
+    font-size:10.5px;
+    color:#525d6e;
+    border-top:1px solid #2b3341;
+    padding-top:14px;
+  }
+
+  /* ---- Main ---- */
+  main{flex:1;padding:28px 34px;max-width:1180px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  h1.page-title{
+    font-family:'Roboto Slab',serif;
+    color:var(--paper-2);
+    font-size:22px;
+    margin:0 0 3px 0;
+  }
+  .page-sub{color:var(--muted);font-size:13px;margin-bottom:22px;}
+
+  .sheet{
+    background:var(--paper);
+    border-radius:3px;
+    padding:20px 22px;
+    margin-bottom:16px;
+    box-shadow:0 1px 0 rgba(0,0,0,.25);
+  }
+  .sheet-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:10px;
+  }
+  .sheet-head h2{
+    font-family:'Roboto Slab',serif;
+    font-size:15.5px;margin:0;color:var(--ink);
+  }
+
+  button{
+    font-family:'Inter',sans-serif;
+    cursor:pointer;border:none;border-radius:3px;
+    font-size:12.5px;font-weight:600;
+    padding:8px 14px;
+  }
+  .btn-primary{background:var(--accent-ink);color:var(--accent);}
+  .btn-primary:hover{background:#241a06;}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line);}
+  .btn-ghost:hover{background:#ddd3b3;}
+  .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);}
+  .btn-small{padding:5px 9px;font-size:11.5px;}
+  .btn-sage{background:var(--sage);color:#0e1c17;}
+
+  input,select,textarea{
+    font-family:'Inter',sans-serif;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:8px 10px;
+    font-size:13px;
+    color:var(--ink);
+    width:100%;
+  }
+  label{font-size:11px;color:var(--ink-soft);font-weight:600;text-transform:none;display:block;margin-bottom:4px;}
+  .field{margin-bottom:12px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{
+    text-align:left;font-family:'Roboto Slab',serif;font-weight:600;
+    font-size:11.5px;color:var(--ink-soft);
+    padding:6px 8px;border-bottom:1px solid var(--line);
+  }
+  td{padding:9px 8px;border-bottom:1px solid #d9d0b3;vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(255,255,255,.25);}
+
+  .stamp{
+    display:inline-block;
+    padding:2px 8px;
+    border:1.5px solid;
+    border-radius:3px;
+    font-size:10.5px;
+    font-weight:700;
+    transform:rotate(-1.5deg);
+    letter-spacing:.3px;
+  }
+  .stamp-pend{border-color:#a07a2c;color:#a07a2c;}
+  .stamp-ok{border-color:var(--success);color:var(--success);}
+  .stamp-cancel{border-color:var(--danger);color:var(--danger);}
+
+  .pill{
+    display:inline-block;padding:2px 8px;border-radius:10px;
+    font-size:10.5px;font-weight:600;
+  }
+  .pill-cliente{background:#3a4d6b;color:#cfe0ff;}
+  .pill-proveedor{background:#5a4a2e;color:#f0dcb0;}
+
+  .empty{color:var(--ink-soft);font-size:13px;font-style:italic;padding:14px 4px;}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
+  .kpi{
+    background:var(--paper);border-radius:3px;padding:16px 18px;
+  }
+  .kpi .n{font-family:'Roboto Slab',serif;font-size:24px;color:var(--ink);}
+  .kpi .l{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .kpi.warn .n{color:var(--danger);}
+
+  .alert{
+    background:#3a2a1c;border-left:3px solid var(--accent);
+    color:#f0d9ae;padding:10px 14px;border-radius:3px;
+    font-size:12.5px;margin-bottom:14px;
+  }
+  .alert.danger{background:#3a1e1c;border-left-color:var(--danger);color:#f0c0b8;}
+
+  .hidden{display:none !important;}
+
+  /* ---- WhatsApp module ---- */
+  .wa-wrap{display:flex;gap:16px;}
+  .wa-chat{
+    flex:1;background:#0d1b17;border-radius:6px;
+    display:flex;flex-direction:column;height:520px;
+    overflow:hidden;
+  }
+  .wa-head{
+    background:#0a2e26;color:#eafff4;padding:12px 16px;
+    font-family:'Roboto Slab',serif;font-size:14px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .wa-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:#0d1b17;}
+  .bubble{max-width:75%;padding:9px 12px;border-radius:8px;font-size:13px;line-height:1.4;}
+  .bubble.cliente{align-self:flex-end;background:#1f6b52;color:#eafff4;border-bottom-right-radius:2px;}
+  .bubble.bot{align-self:flex-start;background:#1c2b33;color:#dbe6e9;border-bottom-left-radius:2px;}
+  .bubble .meta{font-size:9.5px;opacity:.6;margin-top:4px;}
+  .order-card{
+    align-self:flex-start;background:var(--paper-2);color:var(--ink);
+    border-radius:8px;padding:12px 14px;max-width:80%;font-size:12.5px;
+  }
+  .order-card table{margin:8px 0;}
+  .order-card .actions{display:flex;gap:8px;margin-top:10px;}
+  .wa-input{display:flex;gap:8px;padding:10px;background:#0a1611;}
+  .wa-input input{flex:1;}
+  .wa-side{width:280px;flex-shrink:0;}
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:#2b3341;border-radius:4px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav class="rail">
+    <div class="rail-brand">Bitácora<small>Panel de operaciones comerciales</small></div>
+    <div class="tab active" data-view="resumen"><span class="mono-ico">R</span>Resumen</div>
+    <div class="tab" data-view="agenda"><span class="mono-ico">A</span>Agenda</div>
+    <div class="tab" data-view="calendario"><span class="mono-ico">C</span>Visitas</div>
+    <div class="tab" data-view="inventario"><span class="mono-ico">I</span>Inventario</div>
+    <div class="tab" data-view="finanzas"><span class="mono-ico">$</span>Finanzas</div>
+    <div class="tab" data-view="whatsapp"><span class="mono-ico">W</span>Ventas WhatsApp</div>
+    <div class="rail-foot">Datos guardados en tu almacenamiento personal del artifact.</div>
+  </nav>
+  <main>
+
+    <!-- RESUMEN -->
+    <div class="view active" id="view-resumen">
+      <h1 class="page-title">Resumen general</h1>
+      <div class="page-sub">Estado actual del negocio de un vistazo.</div>
+      <div class="kpi-row" id="kpiRow"></div>
+      <div id="alertsBox"></div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Próximas visitas</h2></div>
+        <div id="resumenVisitas"></div>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Últimos movimientos financieros</h2></div>
+        <div id="resumenFinanzas"></div>
+      </div>
+    </div>
+
+    <!-- AGENDA -->
+    <div class="view" id="view-agenda">
+      <h1 class="page-title">Agenda de contactos</h1>
+      <div class="page-sub">Clientes y proveedores registrados.</div>
+      <div class="sheet">
+        <div class="sheet-head">
+          <h2>Nuevo contacto</h2>
+        </div>
+        <div class="grid3">
+          <div class="field"><label>Tipo</label>
+            <select id="ctTipo"><option value="cliente">Cliente</option><option value="proveedor">Proveedor</option></select>
+          </div>
+          <div class="field"><label>Nombre / Empresa</label><input id="ctNombre" placeholder="Ej. Panadería El Trigo"></div>
+          <div class="field"><label>Teléfono (con código de país)</label><input id="ctTelefono" placeholder="+52 449 123 4567"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Correo electrónico</label><input id="ctCorreo" placeholder="correo@ejemplo.com"></div>
+          <div class="field"><label>Notas</label><input id="ctNotas" placeholder="Notas relevantes"></div>
+        </div>
+        <button class="btn-primary" id="btnAddContact">Guardar contacto</button>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Clientes</h2></div>
+        <div id="listaClientes"></div>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Proveedores</h2></div>
+        <div id="listaProveedores"></div>
+      </div>
+    </div>
+
+    <!-- CALENDARIO -->
+    <div class="view" id="view-calendario">
+      <h1 class="page-title">Calendario de visitas</h1>
+      <div class="page-sub">Visitas vinculadas a clientes o proveedores.</div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Agendar visita</h2></div>
+        <div id="visitCrossAlert"></div>
+        <div class="grid2">
+          <div class="field"><label>Contacto</label><select id="vsContacto"></select></div>
+          <div class="field"><label>Motivo de la visita</label><input id="vsMotivo" placeholder="Ej. Entrega de pedido"></div>
+        </div>
+        <div class="grid3">
+          <div class="field"><label>Fecha</label><input type="date" id="vsFecha"></div>
+          <div class="field"><label>Hora</label><input type="time" id="vsHora"></div>
+          <div class="field"><label>Estado</label>
+            <select id="vsEstado"><option>Pendiente</option><option>Realizada</option><option>Cancelada</option></select>
+          </div>
+        </div>
+        <button class="btn-primary" id="btnAddVisit">Agendar visita</button>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Visitas programadas</h2></div>
+        <div id="listaVisitas"></div>
+      </div>
+    </div>
+
+    <!-- INVENTARIO -->
+    <div class="view" id="view-inventario">
+      <h1 class="page-title">Inventario</h1>
+      <div class="page-sub">Productos, costos, precios y existencias.</div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Subir producto nuevo</h2></div>
+        <div class="grid3">
+          <div class="field"><label>SKU / ID</label><input id="ivSku" placeholder="Ej. CAM-001"></div>
+          <div class="field"><label>Nombre</label><input id="ivNombre" placeholder="Ej. Camiseta azul"></div>
+          <div class="field"><label>Proveedor asociado</label><select id="ivProveedor"></select></div>
+        </div>
+        <div class="field"><label>Descripción</label><input id="ivDesc" placeholder="Descripción breve"></div>
+        <div class="grid3">
+          <div class="field"><label>Costo de compra</label><input type="number" step="0.01" id="ivCosto" placeholder="0.00"></div>
+          <div class="field"><label>Precio de venta</label><input type="number" step="0.01" id="ivPrecio" placeholder="0.00"></div>
+          <div class="field"><label>Stock inicial</label><input type="number" id="ivStock" placeholder="0"></div>
+        </div>
+        <button class="btn-primary" id="btnAddInv">Guardar producto</button>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Catálogo actual</h2></div>
+        <div id="alertStockBox"></div>
+        <div id="listaInventario"></div>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Ajustar stock manualmente</h2></div>
+        <div class="grid3">
+          <div class="field"><label>Producto</label><select id="ajSku"></select></div>
+          <div class="field"><label>Movimiento</label>
+            <select id="ajTipo"><option value="entrada">Entrada (compra)</option><option value="salida">Salida (merma/venta)</option></select>
+          </div>
+          <div class="field"><label>Cantidad</label><input type="number" id="ajCantidad" placeholder="0"></div>
+        </div>
+        <button class="btn-ghost" id="btnAjustar">Aplicar movimiento</button>
+      </div>
+    </div>
+
+    <!-- FINANZAS -->
+    <div class="view" id="view-finanzas">
+      <h1 class="page-title">Finanzas y contabilidad básica</h1>
+      <div class="page-sub">Ingresos, gastos y balance por rango de fechas.</div>
+      <div class="grid2">
+        <div class="sheet">
+          <div class="sheet-head"><h2>Registrar ingreso</h2></div>
+          <div class="field"><label>Concepto</label><input id="inConcepto" placeholder="Ej. Venta mostrador"></div>
+          <div class="field"><label>Monto</label><input type="number" step="0.01" id="inMonto" placeholder="0.00"></div>
+          <button class="btn-sage btn-small" id="btnAddIngreso">Registrar ingreso</button>
+        </div>
+        <div class="sheet">
+          <div class="sheet-head"><h2>Registrar gasto</h2></div>
+          <div class="field"><label>Concepto</label><input id="gaConcepto" placeholder="Ej. Pago a proveedor"></div>
+          <div class="field"><label>Monto</label><input type="number" step="0.01" id="gaMonto" placeholder="0.00"></div>
+          <button class="btn-danger btn-small" id="btnAddGasto">Registrar gasto</button>
+        </div>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Balance por rango de fechas</h2></div>
+        <div class="grid3">
+          <div class="field"><label>Desde</label><input type="date" id="balDesde"></div>
+          <div class="field"><label>Hasta</label><input type="date" id="balHasta"></div>
+          <div class="field" style="display:flex;align-items:flex-end;"><button class="btn-ghost" id="btnCalcBalance">Calcular</button></div>
+        </div>
+        <div id="balanceResult"></div>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head"><h2>Movimientos registrados</h2></div>
+        <div id="listaFinanzas"></div>
+      </div>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div class="view" id="view-whatsapp">
+      <h1 class="page-title">Ventas por WhatsApp</h1>
+      <div class="page-sub">Simulación de conversación de venta con verificación automática de inventario.</div>
+      <div class="wa-wrap">
+        <div class="wa-chat">
+          <div class="wa-head"><span id="waClientName">Cliente WhatsApp</span><span style="font-size:11px;opacity:.7;">en línea</span></div>
+          <div class="wa-body" id="waBody"></div>
+          <div class="wa-input">
+            <input id="waInput" placeholder="Escribe el mensaje del cliente...">
+            <button class="btn-primary btn-small" id="btnWaSend">Enviar</button>
+          </div>
+        </div>
+        <div class="wa-side">
+          <div class="sheet">
+            <div class="sheet-head"><h2>Datos del cliente</h2></div>
+            <div class="field"><label>Nombre</label><input id="waNombreCliente" placeholder="Nombre del cliente" value="Cliente WhatsApp"></div>
+            <div class="field"><label>Vincular a contacto existente (opcional)</label><select id="waContactoLink"></select></div>
+          </div>
+          <div class="sheet">
+            <div class="sheet-head"><h2>Cómo funciona</h2></div>
+            <div style="font-size:12px;color:var(--ink-soft);line-height:1.5;">
+              Escribe una intención de compra, por ejemplo: "Hola, quiero 2 camisetas azules". El sistema revisa el inventario, arma la orden y espera tu confirmación antes de descontar stock y registrar el ingreso.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const state = { contacts:[], visits:[], inventory:[], finance:[], orders:[], counters:{contact:1,visit:1,order:1} };
+let waPendingOrder = null;
+
+async function loadAll(){
+  const keys = ['contacts','visits','inventory','finance','orders','counters'];
+  for(const k of keys){
+    try{
+      const r = await window.storage.get(k,false);
+      if(r && r.value) state[k] = JSON.parse(r.value);
+    }catch(e){ /* no existe aún, se queda el default */ }
+  }
+  renderAll();
+}
+async function save(key){
+  try{ await window.storage.set(key, JSON.stringify(state[key]), false); }
+  catch(e){ console.error('Error guardando', key, e); }
+}
+
+function fmt(n){ return '$' + (Number(n)||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function nowStamp(){ return new Date().toLocaleString('es-MX'); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------------- NAV ---------------- */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('view-'+t.dataset.view).classList.add('active');
+    renderAll();
+  });
+});
+
+/* ---------------- AGENDA ---------------- */
+document.getElementById('btnAddContact').addEventListener('click', async ()=>{
+  const nombre = document.getElementById('ctNombre').value.trim();
+  if(!nombre){ alert('El nombre o empresa es obligatorio.'); return; }
+  const c = {
+    id: 'C'+state.counters.contact++,
+    tipo: document.getElementById('ctTipo').value,
+    nombre,
+    telefono: document.getElementById('ctTelefono').value.trim(),
+    correo: document.getElementById('ctCorreo').value.trim(),
+    notas: document.getElementById('ctNotas').value.trim(),
+    historial: [{fecha: nowStamp(), texto:'Contacto creado.'}]
+  };
+  state.contacts.push(c);
+  await save('contacts'); await save('counters');
+  ['ctNombre','ctTelefono','ctCorreo','ctNotas'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+});
+
+function contactRow(c){
+  const badge = c.tipo==='cliente' ? '<span class="pill pill-cliente">Cliente</span>' : '<span class="pill pill-proveedor">Proveedor</span>';
+  return `<tr>
+    <td>${badge}<br><b>${esc(c.nombre)}</b></td>
+    <td>${esc(c.telefono)||'—'}</td>
+    <td>${esc(c.correo)||'—'}</td>
+    <td>${esc(c.notas)||'—'}</td>
+    <td>${c.historial.length} evento(s)</td>
+    <td><button class="btn-ghost btn-small" onclick="deleteContact('${c.id}')">Eliminar</button></td>
+  </tr>`;
+}
+window.deleteContact = async (id)=>{
+  if(!confirm('¿Eliminar este contacto?')) return;
+  state.contacts = state.contacts.filter(c=>c.id!==id);
+  await save('contacts'); renderAll();
+};
+
+function renderAgenda(){
+  const clientes = state.contacts.filter(c=>c.tipo==='cliente');
+  const provs = state.contacts.filter(c=>c.tipo==='proveedor');
+  const head = `<table><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Notas</th><th>Historial</th><th></th></tr>`;
+  document.getElementById('listaClientes').innerHTML = clientes.length
+    ? head + clientes.map(contactRow).join('') + '</table>'
+    : '<div class="empty">Aún no hay clientes registrados.</div>';
+  document.getElementById('listaProveedores').innerHTML = provs.length
+    ? head + provs.map(contactRow).join('') + '</table>'
+    : '<div class="empty">Aún no hay proveedores registrados.</div>';
+}
+
+/* ---------------- CALENDARIO ---------------- */
+function fillContactSelects(){
+  const opts = state.contacts.map(c=>`<option value="${c.id}">${esc(c.nombre)} (${c.tipo})</option>`).join('');
+  ['vsContacto','waContactoLink'].forEach(id=>{
+    const el = document.getElementById(id);
+    const prev = el.value;
+    el.innerHTML = (id==='waContactoLink' ? '<option value="">— Sin vincular —</option>' : '') + opts;
+    if(prev) el.value = prev;
+  });
+  const provOpts = state.contacts.filter(c=>c.tipo==='proveedor').map(c=>`<option value="${c.id}">${esc(c.nombre)}</option>`).join('');
+  document.getElementById('ivProveedor').innerHTML = '<option value="">— Sin especificar —</option>' + provOpts;
+}
+
+document.getElementById('btnAddVisit').addEventListener('click', async ()=>{
+  const contactId = document.getElementById('vsContacto').value;
+  const fecha = document.getElementById('vsFecha').value;
+  const hora = document.getElementById('vsHora').value;
+  const motivo = document.getElementById('vsMotivo').value.trim();
+  if(!contactId || !fecha || !hora || !motivo){ alert('Contacto, fecha, hora y motivo son obligatorios.'); return; }
+  const cruce = state.visits.some(v=>v.fecha===fecha && v.hora===hora && v.estado!=='Cancelada');
+  if(cruce && !confirm('Ya existe otra visita en esa fecha y hora. ¿Agendar de todas formas?')) return;
+  const contact = state.contacts.find(c=>c.id===contactId);
+  state.visits.push({
+    id:'V'+state.counters.visit++, contactId, contactNombre: contact?contact.nombre:'—',
+    fecha, hora, motivo, estado: document.getElementById('vsEstado').value
+  });
+  await save('visits'); await save('counters');
+  document.getElementById('vsMotivo').value='';
+  renderAll();
+});
+
+function stampFor(estado){
+  if(estado==='Realizada') return `<span class="stamp stamp-ok">REALIZADA</span>`;
+  if(estado==='Cancelada') return `<span class="stamp stamp-cancel">CANCELADA</span>`;
+  return `<span class="stamp stamp-pend">PENDIENTE</span>`;
+}
+
+function renderCalendario(){
+  const box = document.getElementById('visitCrossAlert');
+  box.innerHTML='';
+  const sorted = [...state.visits].sort((a,b)=> (a.fecha+a.hora).localeCompare(b.fecha+b.hora));
+  if(!sorted.length){ document.getElementById('listaVisitas').innerHTML = '<div class="empty">No hay visitas agendadas.</div>'; return; }
+  let rows = sorted.map(v=>`<tr>
+    <td>${esc(v.fecha)}</td><td>${esc(v.hora)}</td><td>${esc(v.contactNombre)}</td><td>${esc(v.motivo)}</td>
+    <td>${stampFor(v.estado)}</td>
+    <td>
+      <select onchange="updateVisitStatus('${v.id}', this.value)" style="width:auto;display:inline-block;">
+        <option ${v.estado==='Pendiente'?'selected':''}>Pendiente</option>
+        <option ${v.estado==='Realizada'?'selected':''}>Realizada</option>
+        <option ${v.estado==='Cancelada'?'selected':''}>Cancelada</option>
+      </select>
+      <button class="btn-ghost btn-small" onclick="deleteVisit('${v.id}')">Eliminar</button>
+    </td>
+  </tr>`).join('');
+  document.getElementById('listaVisitas').innerHTML = `<table><tr><th>Fecha</th><th>Hora</th><th>Contacto</th><th>Motivo</th><th>Estado</th><th></th></tr>${rows}</table>`;
+}
+window.updateVisitStatus = async (id, val)=>{
+  const v = state.visits.find(x=>x.id===id); if(v){ v.estado = val; await save('visits'); renderAll(); }
+};
+window.deleteVisit = async (id)=>{
+  state.visits = state.visits.filter(v=>v.id!==id); await save('visits'); renderAll();
+};
+
+/* ---------------- INVENTARIO ---------------- */
+document.getElementById('btnAddInv').addEventListener('click', async ()=>{
+  const sku = document.getElementById('ivSku').value.trim();
+  const nombre = document.getElementById('ivNombre').value.trim();
+  if(!sku || !nombre){ alert('SKU y nombre son obligatorios.'); return; }
+  if(state.inventory.some(p=>p.sku===sku)){ alert('Ya existe un producto con ese SKU.'); return; }
+  state.inventory.push({
+    sku, nombre, descripcion: document.getElementById('ivDesc').value.trim(),
+    costo: Number(document.getElementById('ivCosto').value)||0,
+    precio: Number(document.getElementById('ivPrecio').value)||0,
+    stock: Number(document.getElementById('ivStock').value)||0,
+    proveedorId: document.getElementById('ivProveedor').value,
+    umbral: 5
+  });
+  await save('inventory');
+  ['ivSku','ivNombre','ivDesc','ivCosto','ivPrecio','ivStock'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+});
+
+function fillInvSelects(){
+  const opts = state.inventory.map(p=>`<option value="${p.sku}">${p.sku} — ${esc(p.nombre)} (stock: ${p.stock})</option>`).join('');
+  document.getElementById('ajSku').innerHTML = opts || '<option value="">Sin productos</option>';
+}
+
+document.getElementById('btnAjustar').addEventListener('click', async ()=>{
+  const sku = document.getElementById('ajSku').value;
+  const tipo = document.getElementById('ajTipo').value;
+  const cant = Number(document.getElementById('ajCantidad').value);
+  const prod = state.inventory.find(p=>p.sku===sku);
+  if(!prod || !cant || cant<=0){ alert('Selecciona un producto y una cantidad válida.'); return; }
+  if(tipo==='salida' && cant>prod.stock){ alert('La salida excede el stock disponible.'); return; }
+  prod.stock += tipo==='entrada' ? cant : -cant;
+  await save('inventory');
+  document.getElementById('ajCantidad').value='';
+  renderAll();
+});
+
+function renderInventario(){
+  const alertBox = document.getElementById('alertStockBox');
+  const bajos = state.inventory.filter(p=>p.stock<=p.umbral);
+  alertBox.innerHTML = bajos.length ? `<div class="alert danger">Stock bajo en: ${bajos.map(p=>esc(p.nombre)+' ('+p.stock+')').join(', ')}.</div>` : '';
+  if(!state.inventory.length){ document.getElementById('listaInventario').innerHTML='<div class="empty">Aún no hay productos en el catálogo.</div>'; return; }
+  const rows = state.inventory.map(p=>{
+    const prov = state.contacts.find(c=>c.id===p.proveedorId);
+    const low = p.stock<=p.umbral ? 'style="color:var(--danger);font-weight:700;"' : '';
+    return `<tr>
+      <td><b>${esc(p.sku)}</b></td><td>${esc(p.nombre)}<br><span style="color:var(--ink-soft);font-size:11.5px;">${esc(p.descripcion)}</span></td>
+      <td>${fmt(p.costo)}</td><td>${fmt(p.precio)}</td>
+      <td ${low}>${p.stock}</td>
+      <td>${prov?esc(prov.nombre):'—'}</td>
+      <td><button class="btn-ghost btn-small" onclick="deleteInv('${p.sku}')">Eliminar</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('listaInventario').innerHTML = `<table><tr><th>SKU</th><th>Producto</th><th>Costo</th><th>Precio</th><th>Stock</th><th>Proveedor</th><th></th></tr>${rows}</table>`;
+}
+window.deleteInv = async (sku)=>{
+  if(!confirm('¿Eliminar este producto del inventario?')) return;
+  state.inventory = state.inventory.filter(p=>p.sku!==sku); await save('inventory'); renderAll();
+};
+
+/* ---------------- FINANZAS ---------------- */
+async function addFinance(tipo, concepto, monto, ordenId){
+  if(!concepto || !monto || monto<=0) return false;
+  state.finance.push({id:'F'+Date.now()+Math.floor(Math.random()*999), tipo, concepto, monto:Number(monto), fecha: todayISO(), ordenId: ordenId||null});
+  await save('finance');
+  return true;
+}
+document.getElementById('btnAddIngreso').addEventListener('click', async ()=>{
+  const ok = await addFinance('ingreso', document.getElementById('inConcepto').value.trim(), Number(document.getElementById('inMonto').value));
+  if(!ok){ alert('Concepto y monto son obligatorios.'); return; }
+  document.getElementById('inConcepto').value=''; document.getElementById('inMonto').value='';
+  renderAll();
+});
+document.getElementById('btnAddGasto').addEventListener('click', async ()=>{
+  const ok = await addFinance('gasto', document.getElementById('gaConcepto').value.trim(), Number(document.getElementById('gaMonto').value));
+  if(!ok){ alert('Concepto y monto son obligatorios.'); return; }
+  document.getElementById('gaConcepto').value=''; document.getElementById('gaMonto').value='';
+  renderAll();
+});
+document.getElementById('btnCalcBalance').addEventListener('click', ()=>{
+  const desde = document.getElementById('balDesde').value;
+  const hasta = document.getElementById('balHasta').value;
+  if(!desde || !hasta){ alert('Selecciona ambas fechas.'); return; }
+  const rango = state.finance.filter(f=>f.fecha>=desde && f.fecha<=hasta);
+  const ingresos = rango.filter(f=>f.tipo==='ingreso').reduce((s,f)=>s+f.monto,0);
+  const gastos = rango.filter(f=>f.tipo==='gasto').reduce((s,f)=>s+f.monto,0);
+  const utilidad = ingresos-gastos;
+  document.getElementById('balanceResult').innerHTML = `
+    <div class="kpi-row" style="grid-template-columns:1fr 1fr 1fr;margin-top:10px;">
+      <div class="kpi"><div class="n">${fmt(ingresos)}</div><div class="l">Ingresos</div></div>
+      <div class="kpi"><div class="n">${fmt(gastos)}</div><div class="l">Gastos</div></div>
+      <div class="kpi ${utilidad<0?'warn':''}"><div class="n">${fmt(utilidad)}</div><div class="l">Utilidad neta</div></div>
+    </div>`;
+});
+
+function renderFinanzas(){
+  if(!state.finance.length){ document.getElementById('listaFinanzas').innerHTML='<div class="empty">Aún no hay movimientos registrados.</div>'; return; }
+  const rows = [...state.finance].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(f=>`<tr>
+    <td>${esc(f.fecha)}</td>
+    <td>${f.tipo==='ingreso'?'<span class="stamp stamp-ok">INGRESO</span>':'<span class="stamp stamp-cancel">GASTO</span>'}</td>
+    <td>${esc(f.concepto)}</td><td>${fmt(f.monto)}</td><td>${f.ordenId?esc(f.ordenId):'—'}</td>
+  </tr>`).join('');
+  document.getElementById('listaFinanzas').innerHTML = `<table><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Monto</th><th>Orden</th></tr>${rows}</table>`;
+}
+
+/* ---------------- RESUMEN ---------------- */
+function renderResumen(){
+  const stockBajo = state.inventory.filter(p=>p.stock<=p.umbral).length;
+  const pendientes = state.visits.filter(v=>v.estado==='Pendiente').length;
+  const ingresos = state.finance.filter(f=>f.tipo==='ingreso').reduce((s,f)=>s+f.monto,0);
+  const gastos = state.finance.filter(f=>f.tipo==='gasto').reduce((s,f)=>s+f.monto,0);
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi"><div class="n">${state.contacts.length}</div><div class="l">Contactos totales</div></div>
+    <div class="kpi"><div class="n">${pendientes}</div><div class="l">Visitas pendientes</div></div>
+    <div class="kpi ${stockBajo?'warn':''}"><div class="n">${stockBajo}</div><div class="l">Productos con stock bajo</div></div>
+    <div class="kpi ${ (ingresos-gastos)<0 ? 'warn':''}"><div class="n">${fmt(ingresos-gastos)}</div><div class="l">Utilidad neta acumulada</div></div>
+  `;
+  const alerts = [];
+  const bajos = state.inventory.filter(p=>p.stock<=p.umbral);
+  if(bajos.length) alerts.push(`<div class="alert danger">Stock bajo: ${bajos.map(p=>esc(p.nombre)).join(', ')}.</div>`);
+  document.getElementById('alertsBox').innerHTML = alerts.join('');
+
+  const prox = [...state.visits].filter(v=>v.estado==='Pendiente').sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora)).slice(0,5);
+  document.getElementById('resumenVisitas').innerHTML = prox.length
+    ? `<table><tr><th>Fecha</th><th>Hora</th><th>Contacto</th><th>Motivo</th></tr>${prox.map(v=>`<tr><td>${esc(v.fecha)}</td><td>${esc(v.hora)}</td><td>${esc(v.contactNombre)}</td><td>${esc(v.motivo)}</td></tr>`).join('')}</table>`
+    : '<div class="empty">No hay visitas pendientes.</div>';
+
+  const ult = [...state.finance].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,5);
+  document.getElementById('resumenFinanzas').innerHTML = ult.length
+    ? `<table><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Monto</th></tr>${ult.map(f=>`<tr><td>${esc(f.fecha)}</td><td>${f.tipo}</td><td>${esc(f.concepto)}</td><td>${fmt(f.monto)}</td></tr>`).join('')}</table>`
+    : '<div class="empty">No hay movimientos aún.</div>';
+}
+
+/* ---------------- WHATSAPP / VENTAS ---------------- */
+function waAppend(html){
+  const body = document.getElementById('waBody');
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  body.appendChild(div.firstElementChild);
+  body.scrollTop = body.scrollHeight;
+}
+function waBubble(from, text){
+  waAppend(`<div class="bubble ${from}">${esc(text)}<div class="meta">${nowStamp()}</div></div>`);
+}
+
+document.getElementById('btnWaSend').addEventListener('click', handleWaSend);
+document.getElementById('waInput').addEventListener('keydown', e=>{ if(e.key==='Enter') handleWaSend(); });
+
+async function handleWaSend(){
+  const input = document.getElementById('waInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value='';
+  waBubble('cliente', msg);
+  await procesarIntencion(msg);
+}
+
+async function procesarIntencion(msg){
+  if(!state.inventory.length){
+    waBubble('bot','Por ahora no tenemos productos cargados en el inventario, así que no puedo verificar disponibilidad.');
+    return;
+  }
+  waBubble('bot','Un momento, estoy revisando el inventario…');
+  const catalogo = state.inventory.map(p=>({sku:p.sku, nombre:p.nombre, precio:p.precio, stock:p.stock}));
+  const systemPrompt = `Eres el motor de interpretación de pedidos de un CRM de ventas por WhatsApp.
+Recibirás el catálogo de inventario disponible en formato JSON y el mensaje de un cliente.
+Responde ÚNICAMENTE con un objeto JSON válido, sin texto adicional, sin backticks, con esta forma exacta:
+{"items":[{"sku":"...","cantidad":n}],"aclaracion":null}
+Reglas:
+- Solo incluye productos que existan en el catálogo (compara por nombre de forma aproximada, sin distinguir mayúsculas/acentos).
+- Si el cliente no especifica cantidad para un producto identificado, asume cantidad 1.
+- Si el mensaje no es una intención de compra, o no logras identificar ningún producto del catálogo, deja "items" como arreglo vacío y coloca en "aclaracion" una pregunta breve, amable y en español pidiendo que especifique el producto que desea, mencionando 2 o 3 productos del catálogo como ejemplo.
+- Si identificas productos pero falta información importante, igual llena "items" con lo que sí identificaste y usa "aclaracion" para pedir lo que falta.
+Catálogo:
+${JSON.stringify(catalogo)}`;
+
+  try{
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        system: systemPrompt,
+        messages:[{role:'user', content: msg}]
+      })
+    });
+    const data = await resp.json();
+    let raw = (data.content||[]).map(b=>b.text||'').join('').trim();
+    raw = raw.replace(/^```json/,'').replace(/^```/,'').replace(/```$/,'').trim();
+    let parsed;
+    try{ parsed = JSON.parse(raw); }catch(e){ parsed = {items:[], aclaracion:'No logré entender bien tu pedido. ¿Podrías indicarme qué producto y cantidad deseas?'}; }
+    await mostrarResultadoIntencion(parsed);
+  }catch(e){
+    waBubble('bot','Tuve un problema técnico revisando el pedido. ¿Puedes repetir qué producto y cantidad deseas?');
+  }
+}
+
+async function mostrarResultadoIntencion(parsed){
+  const items = Array.isArray(parsed.items)? parsed.items : [];
+  const resueltos = [];
+  const sinStock = [];
+  for(const it of items){
+    const prod = state.inventory.find(p=>p.sku===it.sku);
+    if(!prod) continue;
+    const cantidad = Math.max(1, Number(it.cantidad)||1);
+    if(prod.stock < cantidad){ sinStock.push({...prod, solicitado:cantidad}); continue; }
+    resueltos.push({sku:prod.sku, nombre:prod.nombre, cantidad, precio:prod.precio});
+  }
+
+  if(parsed.aclaracion){ waBubble('bot', parsed.aclaracion); }
+
+  if(sinStock.length){
+    waBubble('bot', 'No tenemos stock suficiente de: ' + sinStock.map(p=>`${p.nombre} (disponible: ${p.stock}, solicitado: ${p.solicitado})`).join(', ') + '.');
+  }
+
+  if(!resueltos.length) return;
+
+  const total = resueltos.reduce((s,i)=>s+i.cantidad*i.precio,0);
+  waPendingOrder = { items: resueltos, total };
+
+  const rows = resueltos.map(i=>`<tr><td>${esc(i.nombre)}</td><td>${i.cantidad}</td><td>${fmt(i.precio)}</td><td>${fmt(i.cantidad*i.precio)}</td></tr>`).join('');
+  waAppend(`<div class="order-card">
+    <b>Resumen del pedido</b>
+    <table><tr><th>Producto</th><th>Cant.</th><th>P. unit.</th><th>Subtotal</th></tr>${rows}</table>
+    <b>Total: ${fmt(total)}</b>
+    <div class="actions">
+      <button class="btn-sage btn-small" onclick="confirmarOrden()">Confirmar pedido</button>
+      <button class="btn-ghost btn-small" onclick="cancelarOrden()">Cancelar</button>
+    </div>
+  </div>`);
+}
+
+window.cancelarOrden = ()=>{
+  waPendingOrder = null;
+  waBubble('bot','Pedido cancelado. Avísame si deseas ordenar algo más.');
+};
+
+window.confirmarOrden = async ()=>{
+  if(!waPendingOrder) return;
+  const nombreCliente = document.getElementById('waNombreCliente').value.trim() || 'Cliente WhatsApp';
+  const contactId = document.getElementById('waContactoLink').value || null;
+
+  for(const it of waPendingOrder.items){
+    const prod = state.inventory.find(p=>p.sku===it.sku);
+    if(prod) prod.stock -= it.cantidad;
+  }
+  await save('inventory');
+
+  const orderId = state.counters.order++;
+  const orden = { id:'ORD-'+orderId, contactId, contactNombre: nombreCliente, items: waPendingOrder.items, total: waPendingOrder.total, estado:'Confirmada', fecha: todayISO() };
+  state.orders.push(orden);
+  await save('orders'); await save('counters');
+
+  await addFinance('ingreso', `Venta WhatsApp orden #${orderId} — ${nombreCliente}`, waPendingOrder.total, orden.id);
+
+  if(contactId){
+    const c = state.contacts.find(x=>x.id===contactId);
+    if(c){ c.historial.push({fecha: nowStamp(), texto:`Compra confirmada, orden ${orden.id} por ${fmt(orden.total)}.`}); await save('contacts'); }
+  }
+
+  const detalle = waPendingOrder.items.map(i=>`${i.nombre} x${i.cantidad}`).join(', ');
+  const msg = `¡Hola ${nombreCliente}! Tu orden #${orderId} ha sido aceptada con éxito. Detalle: ${detalle}. Total: ${fmt(waPendingOrder.total)}. Pronto nos comunicaremos para la entrega.`;
+  waBubble('bot', msg);
+
+  waPendingOrder = null;
+  renderAll();
+};
+
+document.getElementById('waContactoLink').addEventListener('change', function(){
+  const c = state.contacts.find(x=>x.id===this.value);
+  if(c) document.getElementById('waNombreCliente').value = c.nombre;
+});
+
+/* ---------------- RENDER ALL ---------------- */
+function renderAll(){
+  fillContactSelects();
+  fillInvSelects();
+  renderResumen();
+  renderAgenda();
+  renderCalendario();
+  renderInventario();
+  renderFinanzas();
+}
+
+loadAll();
+</script>
+</body>
+</html>
