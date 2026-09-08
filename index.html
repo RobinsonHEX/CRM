@@ -204,8 +204,7 @@
     font-size:12.5px;margin-bottom:14px;
   }
   .alert.danger{background:#3a1e1c;border-left-color:var(--danger);color:#f0c0b8;}
-
-  .hidden{display:none !important;}
+  .alert.info{background:#1c2b3a;border-left-color:#4a8cb4;color:#b8dc00;}
 
   /* ---- WhatsApp module ---- */
   .wa-wrap{display:flex;gap:16px;}
@@ -248,7 +247,8 @@
     <div class="tab" data-view="inventario"><span class="mono-ico">I</span>Inventario</div>
     <div class="tab" data-view="finanzas"><span class="mono-ico">$</span>Finanzas</div>
     <div class="tab" data-view="whatsapp"><span class="mono-ico">W</span>Ventas WhatsApp</div>
-    <div class="rail-foot">Datos guardados en tu almacenamiento personal del artifact.</div>
+    <div class="tab" data-view="exportar"><span class="mono-ico">E</span>Exportar Excel</div>
+    <div class="rail-foot">Datos guardados en tu almacenamiento local.</div>
   </nav>
   <main>
 
@@ -259,7 +259,7 @@
       <div class="kpi-row" id="kpiRow"></div>
       <div id="alertsBox"></div>
       <div class="sheet">
-        <div class="sheet-head"><h2>Próximas visitas</h2></div>
+        <div class="sheet-head"><h2>Próximas visitas / viajes</h2></div>
         <div id="resumenVisitas"></div>
       </div>
       <div class="sheet">
@@ -301,14 +301,15 @@
 
     <!-- CALENDARIO -->
     <div class="view" id="view-calendario">
-      <h1 class="page-title">Calendario de visitas</h1>
-      <div class="page-sub">Visitas vinculadas a clientes o proveedores.</div>
+      <h1 class="page-title">Calendario de visitas y viajes</h1>
+      <div class="page-sub">Visitas programadas con alertas automáticas según cercanía de fecha.</div>
+      <div id="visitAlertsBanner"></div>
       <div class="sheet">
-        <div class="sheet-head"><h2>Agendar visita</h2></div>
+        <div class="sheet-head"><h2>Agendar visita / viaje</h2></div>
         <div id="visitCrossAlert"></div>
         <div class="grid2">
           <div class="field"><label>Contacto</label><select id="vsContacto"></select></div>
-          <div class="field"><label>Motivo de la visita</label><input id="vsMotivo" placeholder="Ej. Entrega de pedido"></div>
+          <div class="field"><label>Motivo del viaje o visita</label><input id="vsMotivo" placeholder="Ej. Entrega de pedido o reunión comercial"></div>
         </div>
         <div class="grid3">
           <div class="field"><label>Fecha</label><input type="date" id="vsFecha"></div>
@@ -317,7 +318,7 @@
             <select id="vsEstado"><option>Pendiente</option><option>Realizada</option><option>Cancelada</option></select>
           </div>
         </div>
-        <button class="btn-primary" id="btnAddVisit">Agendar visita</button>
+        <button class="btn-primary" id="btnAddVisit">Agendar evento</button>
       </div>
       <div class="sheet">
         <div class="sheet-head"><h2>Visitas programadas</h2></div>
@@ -398,13 +399,13 @@
     <!-- WHATSAPP -->
     <div class="view" id="view-whatsapp">
       <h1 class="page-title">Ventas por WhatsApp</h1>
-      <div class="page-sub">Simulación de conversación de venta con verificación automática de inventario.</div>
+      <div class="page-sub">Simulación de conversación con detección automática de productos del inventario.</div>
       <div class="wa-wrap">
         <div class="wa-chat">
           <div class="wa-head"><span id="waClientName">Cliente WhatsApp</span><span style="font-size:11px;opacity:.7;">en línea</span></div>
           <div class="wa-body" id="waBody"></div>
           <div class="wa-input">
-            <input id="waInput" placeholder="Escribe el mensaje del cliente...">
+            <input id="waInput" placeholder="Ejemplo: Hola, quiero 2 camisas verde">
             <button class="btn-primary btn-small" id="btnWaSend">Enviar</button>
           </div>
         </div>
@@ -417,10 +418,42 @@
           <div class="sheet">
             <div class="sheet-head"><h2>Cómo funciona</h2></div>
             <div style="font-size:12px;color:var(--ink-soft);line-height:1.5;">
-              Escribe una intención de compra, por ejemplo: "Hola, quiero 2 camisetas azules". El sistema revisa el inventario, arma la orden y espera tu confirmación antes de descontar stock y registrar el ingreso.
+              Escribe un mensaje indicando el producto y la cantidad. El sistema buscará coincidencias en tu inventario local, generará la cotización y actualizará el stock al confirmar.
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- EXPORTACIÓN EXCEL -->
+    <div class="view" id="view-exportar">
+      <h1 class="page-title">Exportación de datos para Excel</h1>
+      <div class="page-sub">Descarga tus registros en formato CSV listo para abrir en Microsoft Excel.</div>
+      
+      <div class="grid2">
+        <div class="sheet">
+          <div class="sheet-head"><h2>Ventas y Gastos (Folios y Lista)</h2></div>
+          <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;line-height:1.4;">
+            Descarga el archivo completo de movimientos financieros indicando ID/Folio, Fecha, Tipo (Ingreso/Gasto), Concepto y Monto.
+          </div>
+          <button class="btn-sage" id="btnExpFinanzas">Descargar Movimientos (.csv)</button>
+        </div>
+
+        <div class="sheet">
+          <div class="sheet-head"><h2>Contactos (Clientes y Proveedores)</h2></div>
+          <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;line-height:1.4;">
+            Obtén el directorio completo clasificado por Tipo (Cliente/Proveedor), Nombre, Teléfono, Correo y Notas.
+          </div>
+          <button class="btn-primary" id="btnExpContactos">Descargar Contactos (.csv)</button>
+        </div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head"><h2>Órdenes de Venta WhatsApp por Folio</h2></div>
+        <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;line-height:1.4;">
+          Descarga las órdenes de venta procesadas con detalle de Folio de Orden, Cliente, Productos, Total e Historial.
+        </div>
+        <button class="btn-ghost" id="btnExpOrdenes">Descargar Órdenes WhatsApp (.csv)</button>
       </div>
     </div>
 
@@ -431,18 +464,19 @@
 const state = { contacts:[], visits:[], inventory:[], finance:[], orders:[], counters:{contact:1,visit:1,order:1} };
 let waPendingOrder = null;
 
-async function loadAll(){
+function loadAll(){
   const keys = ['contacts','visits','inventory','finance','orders','counters'];
   for(const k of keys){
     try{
-      const r = await window.storage.get(k,false);
-      if(r && r.value) state[k] = JSON.parse(r.value);
-    }catch(e){ /* no existe aún, se queda el default */ }
+      const r = localStorage.getItem('crm_' + k);
+      if(r) state[k] = JSON.parse(r);
+    }catch(e){ console.error('Error cargando', k, e); }
   }
   renderAll();
 }
-async function save(key){
-  try{ await window.storage.set(key, JSON.stringify(state[key]), false); }
+
+function save(key){
+  try{ localStorage.setItem('crm_' + key, JSON.stringify(state[key])); }
   catch(e){ console.error('Error guardando', key, e); }
 }
 
@@ -450,6 +484,75 @@ function fmt(n){ return '$' + (Number(n)||0).toLocaleString('es-MX',{minimumFrac
 function todayISO(){ return new Date().toISOString().slice(0,10); }
 function nowStamp(){ return new Date().toLocaleString('es-MX'); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------------- EXPORTADOR A EXCEL / CSV ---------------- */
+function downloadCSV(filename, csvData) {
+  // \uFEFF añade el Byte Order Mark (BOM) para que Excel reconozca acentos y UTF-8 correctamente
+  const blob = new Blob(["\uFEFF" + csvData], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+document.getElementById('btnExpFinanzas').addEventListener('click', ()=>{
+  if(!state.finance.length){ alert('No hay registros financieros para exportar.'); return; }
+  let csv = "Folio_ID;Fecha;Tipo;Concepto;Monto;Orden_Asociada\n";
+  state.finance.forEach(f => {
+    const conceptoClean = `"${(f.concepto||'').replace(/"/g, '""')}"`;
+    csv += `${f.id};${f.fecha};${f.tipo.toUpperCase()};${conceptoClean};${f.monto};${f.ordenId||''}\n`;
+  });
+  downloadCSV(`Ventas_y_Gastos_${todayISO()}.csv`, csv);
+});
+
+document.getElementById('btnExpContactos').addEventListener('click', ()=>{
+  if(!state.contacts.length){ alert('No hay contactos registrados para exportar.'); return; }
+  let csv = "ID;Tipo;Nombre_Empresa;Telefono;Correo;Notas\n";
+  state.contacts.forEach(c => {
+    const nombre = `"${(c.nombre||'').replace(/"/g, '""')}"`;
+    const notas = `"${(c.notas||'').replace(/"/g, '""')}"`;
+    csv += `${c.id};${c.tipo.toUpperCase()};${nombre};${c.telefono||''};${c.correo||''};${notas}\n`;
+  });
+  downloadCSV(`Directorio_Clientes_Proveedores_${todayISO()}.csv`, csv);
+});
+
+document.getElementById('btnExpOrdenes').addEventListener('click', ()=>{
+  if(!state.orders.length){ alert('No hay órdenes registradas para exportar.'); return; }
+  let csv = "Folio_Orden;Fecha;Cliente;Productos_Detalle;Total\n";
+  state.orders.forEach(o => {
+    const cliente = `"${(o.contactNombre||'').replace(/"/g, '""')}"`;
+    const prods = `"${o.items.map(i=>`${i.nombre} (x${i.cantidad})`).join(', ').replace(/"/g, '""')}"`;
+    csv += `${o.id};${o.fecha};${cliente};${prods};${o.total}\n`;
+  });
+  downloadCSV(`Ordenes_Ventas_WhatsApp_${todayISO()}.csv`, csv);
+});
+
+/* ---------------- SISTEMA DE ALERTAS DE VISITAS/VIAJES ---------------- */
+function getVisitAlerts(){
+  const hoyStr = todayISO();
+  const hoy = new Date(hoyStr + "T00:00:00");
+  const alertas = [];
+
+  state.visits.forEach(v => {
+    if(v.estado !== 'Pendiente') return;
+    const fVisita = new Date(v.fecha + "T00:00:00");
+    const diffTime = fVisita - hoy;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if(diffDays < 0){
+      alertas.push({ tipo:'danger', texto: `¡ATENCIÓN! La visita/viaje con <b>${esc(v.contactNombre)}</b> (${esc(v.motivo)}) estaba programada para el <b>${v.fecha}</b> y está vencida.` });
+    } else if(diffDays === 0){
+      alertas.push({ tipo:'danger', texto: `<b>HOY TIENES UN VIAJE/VISITA:</b> Con <b>${esc(v.contactNombre)}</b> a las <b>${v.hora}</b> hs (${esc(v.motivo)}).` });
+    } else if(diffDays <= 3){
+      alertas.push({ tipo:'alert', texto: `<b>PRÓXIMO VIAJE/VISITA (${diffDays} días):</b> Con <b>${esc(v.contactNombre)}</b> el <b>${v.fecha}</b> a las <b>${v.hora}</b> (${esc(v.motivo)}).` });
+    }
+  });
+
+  return alertas;
+}
 
 /* ---------------- NAV ---------------- */
 document.querySelectorAll('.tab').forEach(t=>{
@@ -463,7 +566,7 @@ document.querySelectorAll('.tab').forEach(t=>{
 });
 
 /* ---------------- AGENDA ---------------- */
-document.getElementById('btnAddContact').addEventListener('click', async ()=>{
+document.getElementById('btnAddContact').addEventListener('click', ()=>{
   const nombre = document.getElementById('ctNombre').value.trim();
   if(!nombre){ alert('El nombre o empresa es obligatorio.'); return; }
   const c = {
@@ -476,7 +579,7 @@ document.getElementById('btnAddContact').addEventListener('click', async ()=>{
     historial: [{fecha: nowStamp(), texto:'Contacto creado.'}]
   };
   state.contacts.push(c);
-  await save('contacts'); await save('counters');
+  save('contacts'); save('counters');
   ['ctNombre','ctTelefono','ctCorreo','ctNotas'].forEach(id=>document.getElementById(id).value='');
   renderAll();
 });
@@ -492,10 +595,10 @@ function contactRow(c){
     <td><button class="btn-ghost btn-small" onclick="deleteContact('${c.id}')">Eliminar</button></td>
   </tr>`;
 }
-window.deleteContact = async (id)=>{
+window.deleteContact = (id)=>{
   if(!confirm('¿Eliminar este contacto?')) return;
   state.contacts = state.contacts.filter(c=>c.id!==id);
-  await save('contacts'); renderAll();
+  save('contacts'); renderAll();
 };
 
 function renderAgenda(){
@@ -523,7 +626,7 @@ function fillContactSelects(){
   document.getElementById('ivProveedor').innerHTML = '<option value="">— Sin especificar —</option>' + provOpts;
 }
 
-document.getElementById('btnAddVisit').addEventListener('click', async ()=>{
+document.getElementById('btnAddVisit').addEventListener('click', ()=>{
   const contactId = document.getElementById('vsContacto').value;
   const fecha = document.getElementById('vsFecha').value;
   const hora = document.getElementById('vsHora').value;
@@ -536,7 +639,7 @@ document.getElementById('btnAddVisit').addEventListener('click', async ()=>{
     id:'V'+state.counters.visit++, contactId, contactNombre: contact?contact.nombre:'—',
     fecha, hora, motivo, estado: document.getElementById('vsEstado').value
   });
-  await save('visits'); await save('counters');
+  save('visits'); save('counters');
   document.getElementById('vsMotivo').value='';
   renderAll();
 });
@@ -548,8 +651,10 @@ function stampFor(estado){
 }
 
 function renderCalendario(){
-  const box = document.getElementById('visitCrossAlert');
-  box.innerHTML='';
+  const alerts = getVisitAlerts();
+  const alertBanner = document.getElementById('visitAlertsBanner');
+  alertBanner.innerHTML = alerts.map(a => `<div class="alert ${a.tipo}">${a.texto}</div>`).join('');
+
   const sorted = [...state.visits].sort((a,b)=> (a.fecha+a.hora).localeCompare(b.fecha+b.hora));
   if(!sorted.length){ document.getElementById('listaVisitas').innerHTML = '<div class="empty">No hay visitas agendadas.</div>'; return; }
   let rows = sorted.map(v=>`<tr>
@@ -566,15 +671,15 @@ function renderCalendario(){
   </tr>`).join('');
   document.getElementById('listaVisitas').innerHTML = `<table><tr><th>Fecha</th><th>Hora</th><th>Contacto</th><th>Motivo</th><th>Estado</th><th></th></tr>${rows}</table>`;
 }
-window.updateVisitStatus = async (id, val)=>{
-  const v = state.visits.find(x=>x.id===id); if(v){ v.estado = val; await save('visits'); renderAll(); }
+window.updateVisitStatus = (id, val)=>{
+  const v = state.visits.find(x=>x.id===id); if(v){ v.estado = val; save('visits'); renderAll(); }
 };
-window.deleteVisit = async (id)=>{
-  state.visits = state.visits.filter(v=>v.id!==id); await save('visits'); renderAll();
+window.deleteVisit = (id)=>{
+  state.visits = state.visits.filter(v=>v.id!==id); save('visits'); renderAll();
 };
 
 /* ---------------- INVENTARIO ---------------- */
-document.getElementById('btnAddInv').addEventListener('click', async ()=>{
+document.getElementById('btnAddInv').addEventListener('click', ()=>{
   const sku = document.getElementById('ivSku').value.trim();
   const nombre = document.getElementById('ivNombre').value.trim();
   if(!sku || !nombre){ alert('SKU y nombre son obligatorios.'); return; }
@@ -587,7 +692,7 @@ document.getElementById('btnAddInv').addEventListener('click', async ()=>{
     proveedorId: document.getElementById('ivProveedor').value,
     umbral: 5
   });
-  await save('inventory');
+  save('inventory');
   ['ivSku','ivNombre','ivDesc','ivCosto','ivPrecio','ivStock'].forEach(id=>document.getElementById(id).value='');
   renderAll();
 });
@@ -597,7 +702,7 @@ function fillInvSelects(){
   document.getElementById('ajSku').innerHTML = opts || '<option value="">Sin productos</option>';
 }
 
-document.getElementById('btnAjustar').addEventListener('click', async ()=>{
+document.getElementById('btnAjustar').addEventListener('click', ()=>{
   const sku = document.getElementById('ajSku').value;
   const tipo = document.getElementById('ajTipo').value;
   const cant = Number(document.getElementById('ajCantidad').value);
@@ -605,7 +710,7 @@ document.getElementById('btnAjustar').addEventListener('click', async ()=>{
   if(!prod || !cant || cant<=0){ alert('Selecciona un producto y una cantidad válida.'); return; }
   if(tipo==='salida' && cant>prod.stock){ alert('La salida excede el stock disponible.'); return; }
   prod.stock += tipo==='entrada' ? cant : -cant;
-  await save('inventory');
+  save('inventory');
   document.getElementById('ajCantidad').value='';
   renderAll();
 });
@@ -628,26 +733,26 @@ function renderInventario(){
   }).join('');
   document.getElementById('listaInventario').innerHTML = `<table><tr><th>SKU</th><th>Producto</th><th>Costo</th><th>Precio</th><th>Stock</th><th>Proveedor</th><th></th></tr>${rows}</table>`;
 }
-window.deleteInv = async (sku)=>{
+window.deleteInv = (sku)=>{
   if(!confirm('¿Eliminar este producto del inventario?')) return;
-  state.inventory = state.inventory.filter(p=>p.sku!==sku); await save('inventory'); renderAll();
+  state.inventory = state.inventory.filter(p=>p.sku!==sku); save('inventory'); renderAll();
 };
 
 /* ---------------- FINANZAS ---------------- */
-async function addFinance(tipo, concepto, monto, ordenId){
+function addFinance(tipo, concepto, monto, ordenId){
   if(!concepto || !monto || monto<=0) return false;
   state.finance.push({id:'F'+Date.now()+Math.floor(Math.random()*999), tipo, concepto, monto:Number(monto), fecha: todayISO(), ordenId: ordenId||null});
-  await save('finance');
+  save('finance');
   return true;
 }
-document.getElementById('btnAddIngreso').addEventListener('click', async ()=>{
-  const ok = await addFinance('ingreso', document.getElementById('inConcepto').value.trim(), Number(document.getElementById('inMonto').value));
+document.getElementById('btnAddIngreso').addEventListener('click', ()=>{
+  const ok = addFinance('ingreso', document.getElementById('inConcepto').value.trim(), Number(document.getElementById('inMonto').value));
   if(!ok){ alert('Concepto y monto son obligatorios.'); return; }
   document.getElementById('inConcepto').value=''; document.getElementById('inMonto').value='';
   renderAll();
 });
-document.getElementById('btnAddGasto').addEventListener('click', async ()=>{
-  const ok = await addFinance('gasto', document.getElementById('gaConcepto').value.trim(), Number(document.getElementById('gaMonto').value));
+document.getElementById('btnAddGasto').addEventListener('click', ()=>{
+  const ok = addFinance('gasto', document.getElementById('gaConcepto').value.trim(), Number(document.getElementById('gaMonto').value));
   if(!ok){ alert('Concepto y monto son obligatorios.'); return; }
   document.getElementById('gaConcepto').value=''; document.getElementById('gaMonto').value='';
   renderAll();
@@ -690,10 +795,14 @@ function renderResumen(){
     <div class="kpi ${stockBajo?'warn':''}"><div class="n">${stockBajo}</div><div class="l">Productos con stock bajo</div></div>
     <div class="kpi ${ (ingresos-gastos)<0 ? 'warn':''}"><div class="n">${fmt(ingresos-gastos)}</div><div class="l">Utilidad neta acumulada</div></div>
   `;
-  const alerts = [];
+  const alertsHtml = [];
+  const visitAlerts = getVisitAlerts();
+  visitAlerts.forEach(a => alertsHtml.push(`<div class="alert ${a.tipo}">${a.texto}</div>`));
+
   const bajos = state.inventory.filter(p=>p.stock<=p.umbral);
-  if(bajos.length) alerts.push(`<div class="alert danger">Stock bajo: ${bajos.map(p=>esc(p.nombre)).join(', ')}.</div>`);
-  document.getElementById('alertsBox').innerHTML = alerts.join('');
+  if(bajos.length) alertsHtml.push(`<div class="alert danger">Stock bajo en productos: ${bajos.map(p=>esc(p.nombre)).join(', ')}.</div>`);
+  
+  document.getElementById('alertsBox').innerHTML = alertsHtml.join('');
 
   const prox = [...state.visits].filter(v=>v.estado==='Pendiente').sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora)).slice(0,5);
   document.getElementById('resumenVisitas').innerHTML = prox.length
@@ -721,77 +830,53 @@ function waBubble(from, text){
 document.getElementById('btnWaSend').addEventListener('click', handleWaSend);
 document.getElementById('waInput').addEventListener('keydown', e=>{ if(e.key==='Enter') handleWaSend(); });
 
-async function handleWaSend(){
+function handleWaSend(){
   const input = document.getElementById('waInput');
   const msg = input.value.trim();
   if(!msg) return;
   input.value='';
   waBubble('cliente', msg);
-  await procesarIntencion(msg);
+  procesarIntencionLocal(msg);
 }
 
-async function procesarIntencion(msg){
+function procesarIntencionLocal(msg){
   if(!state.inventory.length){
-    waBubble('bot','Por ahora no tenemos productos cargados en el inventario, así que no puedo verificar disponibilidad.');
+    waBubble('bot','Por ahora no hay productos cargados en el inventario. Agrega productos en la pestaña "Inventario" para poder cotizar.');
     return;
   }
-  waBubble('bot','Un momento, estoy revisando el inventario…');
-  const catalogo = state.inventory.map(p=>({sku:p.sku, nombre:p.nombre, precio:p.precio, stock:p.stock}));
-  const systemPrompt = `Eres el motor de interpretación de pedidos de un CRM de ventas por WhatsApp.
-Recibirás el catálogo de inventario disponible en formato JSON y el mensaje de un cliente.
-Responde ÚNICAMENTE con un objeto JSON válido, sin texto adicional, sin backticks, con esta forma exacta:
-{"items":[{"sku":"...","cantidad":n}],"aclaracion":null}
-Reglas:
-- Solo incluye productos que existan en el catálogo (compara por nombre de forma aproximada, sin distinguir mayúsculas/acentos).
-- Si el cliente no especifica cantidad para un producto identificado, asume cantidad 1.
-- Si el mensaje no es una intención de compra, o no logras identificar ningún producto del catálogo, deja "items" como arreglo vacío y coloca en "aclaracion" una pregunta breve, amable y en español pidiendo que especifique el producto que desea, mencionando 2 o 3 productos del catálogo como ejemplo.
-- Si identificas productos pero falta información importante, igual llena "items" con lo que sí identificaste y usa "aclaracion" para pedir lo que falta.
-Catálogo:
-${JSON.stringify(catalogo)}`;
 
-  try{
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:1000,
-        system: systemPrompt,
-        messages:[{role:'user', content: msg}]
-      })
-    });
-    const data = await resp.json();
-    let raw = (data.content||[]).map(b=>b.text||'').join('').trim();
-    raw = raw.replace(/^```json/,'').replace(/^```/,'').replace(/```$/,'').trim();
-    let parsed;
-    try{ parsed = JSON.parse(raw); }catch(e){ parsed = {items:[], aclaracion:'No logré entender bien tu pedido. ¿Podrías indicarme qué producto y cantidad deseas?'}; }
-    await mostrarResultadoIntencion(parsed);
-  }catch(e){
-    waBubble('bot','Tuve un problema técnico revisando el pedido. ¿Puedes repetir qué producto y cantidad deseas?');
-  }
-}
+  const msgClean = msg.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const nums = msgClean.match(/\d+/g);
+  const cantidad = nums ? parseInt(nums[0], 10) : 1;
 
-async function mostrarResultadoIntencion(parsed){
-  const items = Array.isArray(parsed.items)? parsed.items : [];
-  const resueltos = [];
-  const sinStock = [];
-  for(const it of items){
-    const prod = state.inventory.find(p=>p.sku===it.sku);
-    if(!prod) continue;
-    const cantidad = Math.max(1, Number(it.cantidad)||1);
-    if(prod.stock < cantidad){ sinStock.push({...prod, solicitado:cantidad}); continue; }
-    resueltos.push({sku:prod.sku, nombre:prod.nombre, cantidad, precio:prod.precio});
+  let prodEncontrado = null;
+  for(const prod of state.inventory){
+    const nombreClean = prod.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const skuClean = prod.sku.toLowerCase();
+    
+    const palabras = nombreClean.split(' ');
+    const coincide = palabras.some(p => p.length > 2 && msgClean.includes(p)) || msgClean.includes(skuClean);
+
+    if(coincide){
+      prodEncontrado = prod;
+      break;
+    }
   }
 
-  if(parsed.aclaracion){ waBubble('bot', parsed.aclaracion); }
-
-  if(sinStock.length){
-    waBubble('bot', 'No tenemos stock suficiente de: ' + sinStock.map(p=>`${p.nombre} (disponible: ${p.stock}, solicitado: ${p.solicitado})`).join(', ') + '.');
+  if(!prodEncontrado){
+    const prodsEjemplo = state.inventory.slice(0, 3).map(p => p.nombre).join(', ');
+    waBubble('bot', `No logré identificar el producto que buscas. Por favor especifica el nombre exacto. Ejemplo de productos disponibles: ${prodsEjemplo}.`);
+    return;
   }
 
-  if(!resueltos.length) return;
+  if(prodEncontrado.stock < cantidad){
+    waBubble('bot', `No tenemos suficiente stock de ${prodEncontrado.nombre}. Disponibles: ${prodEncontrado.stock}, solicitados: ${cantidad}.`);
+    return;
+  }
 
-  const total = resueltos.reduce((s,i)=>s+i.cantidad*i.precio,0);
+  const resueltos = [{ sku: prodEncontrado.sku, nombre: prodEncontrado.nombre, cantidad, precio: prodEncontrado.precio }];
+  const total = cantidad * prodEncontrado.precio;
+
   waPendingOrder = { items: resueltos, total };
 
   const rows = resueltos.map(i=>`<tr><td>${esc(i.nombre)}</td><td>${i.cantidad}</td><td>${fmt(i.precio)}</td><td>${fmt(i.cantidad*i.precio)}</td></tr>`).join('');
@@ -811,7 +896,7 @@ window.cancelarOrden = ()=>{
   waBubble('bot','Pedido cancelado. Avísame si deseas ordenar algo más.');
 };
 
-window.confirmarOrden = async ()=>{
+window.confirmarOrden = ()=>{
   if(!waPendingOrder) return;
   const nombreCliente = document.getElementById('waNombreCliente').value.trim() || 'Cliente WhatsApp';
   const contactId = document.getElementById('waContactoLink').value || null;
@@ -820,18 +905,18 @@ window.confirmarOrden = async ()=>{
     const prod = state.inventory.find(p=>p.sku===it.sku);
     if(prod) prod.stock -= it.cantidad;
   }
-  await save('inventory');
+  save('inventory');
 
   const orderId = state.counters.order++;
   const orden = { id:'ORD-'+orderId, contactId, contactNombre: nombreCliente, items: waPendingOrder.items, total: waPendingOrder.total, estado:'Confirmada', fecha: todayISO() };
   state.orders.push(orden);
-  await save('orders'); await save('counters');
+  save('orders'); save('counters');
 
-  await addFinance('ingreso', `Venta WhatsApp orden #${orderId} — ${nombreCliente}`, waPendingOrder.total, orden.id);
+  addFinance('ingreso', `Venta WhatsApp orden #${orderId} — ${nombreCliente}`, waPendingOrder.total, orden.id);
 
   if(contactId){
     const c = state.contacts.find(x=>x.id===contactId);
-    if(c){ c.historial.push({fecha: nowStamp(), texto:`Compra confirmada, orden ${orden.id} por ${fmt(orden.total)}.`}); await save('contacts'); }
+    if(c){ c.historial.push({fecha: nowStamp(), texto:`Compra confirmada, orden ${orden.id} por ${fmt(orden.total)}.`}); save('contacts'); }
   }
 
   const detalle = waPendingOrder.items.map(i=>`${i.nombre} x${i.cantidad}`).join(', ');
