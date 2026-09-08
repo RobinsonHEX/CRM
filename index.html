@@ -20,43 +20,53 @@
 <body class="flex h-screen overflow-hidden">
 
   <!-- BARRA LATERAL -->
-  <aside class="w-64 glass-card flex flex-col justify-between p-4 z-10">
+  <aside class="w-64 glass-card flex flex-col justify-between p-4 z-10 overflow-y-auto">
     <div>
-      <div class="mb-8 p-2">
-        <h1 id="app-title" contenteditable="true" onblur="guardarTitulo()" class="text-2xl font-bold tracking-wider text-slate-100 outline-none border-b border-transparent hover:border-slate-500 focus:border-emerald-400 cursor-pointer" title="Haz clic para editar el título">Bitácora</h1>
-        <p class="text-xs text-slate-400">Panel de operaciones comerciales</p>
+      
+      <!-- MENU DESPLEGABLE BITÁCORA -->
+      <div class="mb-4">
+        <!-- Botón del Desplegable -->
+        <button onclick="toggleBitacoraMenu()" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800/60 transition group text-left outline-none">
+          <div>
+            <h1 id="app-title" contenteditable="true" onclick="event.stopPropagation();" onblur="guardarTitulo()" class="text-2xl font-bold tracking-wider text-slate-100 outline-none border-b border-transparent hover:border-slate-500 focus:border-emerald-400 cursor-pointer inline-block" title="Haz clic para editar el título">Bitácora</h1>
+            <p class="text-xs text-slate-400">Panel de operaciones comerciales</p>
+          </div>
+          <span id="bitacora-arrow" class="text-slate-400 text-xs transition-transform duration-200 transform rotate-180">▼</span>
+        </button>
+
+        <!-- Submenú Desplegable -->
+        <nav id="bitacora-submenu" class="mt-2 space-y-1 pl-2">
+          <button onclick="switchTab('resumen')" id="btn-resumen" class="w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition sidebar-item-active">
+            <span class="font-bold text-xs uppercase tracking-widest text-slate-400">R</span>
+            <span>Resumen</span>
+          </button>
+          <button onclick="switchTab('clientes')" id="btn-clientes" class="w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+            <span class="font-bold text-xs uppercase tracking-widest text-slate-400">C</span>
+            <span>Clientes</span>
+          </button>
+          <button onclick="switchTab('proveedores')" id="btn-proveedores" class="w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+            <span class="font-bold text-xs uppercase tracking-widest text-slate-400">P</span>
+            <span>Proveedores</span>
+          </button>
+          <button onclick="switchTab('calendario')" id="btn-calendario" class="w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+            <span class="font-bold text-xs uppercase tracking-widest text-slate-400">K</span>
+            <span>Calendario</span>
+          </button>
+          <button onclick="switchTab('inventario')" id="btn-inventario" class="w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+            <span class="font-bold text-xs uppercase tracking-widest text-slate-400">I</span>
+            <span>Inventario</span>
+          </button>
+          <button onclick="switchTab('finanzas')" id="btn-finanzas" class="w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+            <span class="font-bold text-xs uppercase tracking-widest text-slate-400">$</span>
+            <span>Ventas y Compras</span>
+          </button>
+          <button onclick="switchTab('respaldos')" id="btn-respaldos" class="w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+            <span class="font-bold text-xs uppercase tracking-widest text-slate-400">E</span>
+            <span>Datos y Respaldos</span>
+          </button>
+        </nav>
       </div>
 
-      <nav class="space-y-2">
-        <button onclick="switchTab('resumen')" id="btn-resumen" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition sidebar-item-active">
-          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">R</span>
-          <span>Resumen</span>
-        </button>
-        <button onclick="switchTab('clientes')" id="btn-clientes" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
-          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">C</span>
-          <span>Clientes</span>
-        </button>
-        <button onclick="switchTab('proveedores')" id="btn-proveedores" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
-          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">P</span>
-          <span>Proveedores</span>
-        </button>
-        <button onclick="switchTab('calendario')" id="btn-calendario" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
-          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">K</span>
-          <span>Calendario</span>
-        </button>
-        <button onclick="switchTab('inventario')" id="btn-inventario" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
-          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">I</span>
-          <span>Inventario</span>
-        </button>
-        <button onclick="switchTab('finanzas')" id="btn-finanzas" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
-          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">$</span>
-          <span>Ventas y Compras</span>
-        </button>
-        <button onclick="switchTab('respaldos')" id="btn-respaldos" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
-          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">E</span>
-          <span>Datos y Respaldos</span>
-        </button>
-      </nav>
     </div>
   </aside>
 
@@ -72,7 +82,7 @@
           <p id="dash-ingresos" class="text-2xl font-bold text-emerald-400 mt-1">$0.00</p>
         </div>
         <div class="glass-card p-4 rounded-xl">
-          <p class="text-xs uppercase text-slate-400 font-semibold font-semibold">Total Compras / Gastos</p>
+          <p class="text-xs uppercase text-slate-400 font-semibold">Total Compras / Gastos</p>
           <p id="dash-gastos" class="text-2xl font-bold text-rose-400 mt-1">$0.00</p>
         </div>
         <div class="glass-card p-4 rounded-xl">
@@ -480,6 +490,14 @@
       db.titulo = nuevoTitulo;
       document.title = `${nuevoTitulo} — Operaciones Comerciales`;
       saveDb();
+    }
+
+    function toggleBitacoraMenu() {
+      const submenu = document.getElementById('bitacora-submenu');
+      const arrow = document.getElementById('bitacora-arrow');
+      
+      submenu.classList.toggle('hidden');
+      arrow.classList.toggle('rotate-180');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
