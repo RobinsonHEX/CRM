@@ -1,949 +1,630 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bitácora — Operaciones Comerciales</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#12161d;
-    --rail:#1b222d;
-    --rail-hover:#242e3c;
-    --paper:#e9e2cf;
-    --paper-2:#f2ecdd;
-    --ink:#1c1a14;
-    --ink-soft:#5a5648;
-    --line:#c9bfa0;
-    --accent:#d6a84a;
-    --accent-ink:#3a2c0c;
-    --sage:#6e9887;
-    --danger:#b4544a;
-    --success:#587e56;
-    --muted:#8b93a3;
-  }
-  *{box-sizing:border-box;}
-  body{margin:0;padding:0;}
-  html,body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    font-feature-settings:"tnum" 1;
-    height:100%;
-  }
-  #app{display:flex;min-height:100vh;}
-
-  /* ---- Rail ---- */
-  .rail{
-    width:216px;
-    flex-shrink:0;
-    background:var(--rail);
-    padding:22px 0;
-    display:flex;
-    flex-direction:column;
-    gap:2px;
-  }
-  .rail-brand{
-    font-family:'Roboto Slab',serif;
-    color:var(--paper);
-    font-size:17px;
-    font-weight:700;
-    padding:0 20px 20px 20px;
-    border-bottom:1px solid #2b3341;
-    margin-bottom:10px;
-    letter-spacing:.2px;
-  }
-  .rail-brand small{
-    display:block;
-    font-family:'Inter',sans-serif;
-    font-weight:400;
-    font-size:11px;
-    color:var(--muted);
-    margin-top:3px;
-  }
-  .tab{
-    display:flex;
-    align-items:center;
-    gap:11px;
-    padding:11px 20px;
-    color:#c4cad6;
-    cursor:pointer;
-    font-size:13.5px;
-    font-weight:500;
-    border-left:3px solid transparent;
-    transition:background .12s;
-  }
-  .tab:hover{background:var(--rail-hover);}
-  .tab.active{
-    background:var(--rail-hover);
-    border-left:3px solid var(--accent);
-    color:var(--paper-2);
-  }
-  .tab .mono-ico{
-    width:22px;height:22px;border-radius:5px;
-    background:#2b3341;
-    display:flex;align-items:center;justify-content:center;
-    font-size:11px;font-weight:700;color:var(--accent);
-    font-family:'Roboto Slab',serif;
-    flex-shrink:0;
-  }
-  .rail-foot{
-    margin-top:auto;
-    padding:14px 20px 0 20px;
-    font-size:10.5px;
-    color:#525d6e;
-    border-top:1px solid #2b3341;
-    padding-top:14px;
-  }
-
-  /* ---- Main ---- */
-  main{flex:1;padding:28px 34px;max-width:1180px;}
-  .view{display:none;}
-  .view.active{display:block;}
-
-  h1.page-title{
-    font-family:'Roboto Slab',serif;
-    color:var(--paper-2);
-    font-size:22px;
-    margin:0 0 3px 0;
-  }
-  .page-sub{color:var(--muted);font-size:13px;margin-bottom:22px;}
-
-  .sheet{
-    background:var(--paper);
-    border-radius:3px;
-    padding:20px 22px;
-    margin-bottom:16px;
-    box-shadow:0 1px 0 rgba(0,0,0,.25);
-  }
-  .sheet-head{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:14px;
-    border-bottom:1px solid var(--line);
-    padding-bottom:10px;
-  }
-  .sheet-head h2{
-    font-family:'Roboto Slab',serif;
-    font-size:15.5px;margin:0;color:var(--ink);
-  }
-
-  button{
-    font-family:'Inter',sans-serif;
-    cursor:pointer;border:none;border-radius:3px;
-    font-size:12.5px;font-weight:600;
-    padding:8px 14px;
-  }
-  .btn-primary{background:var(--accent-ink);color:var(--accent);}
-  .btn-primary:hover{background:#241a06;}
-  .btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line);}
-  .btn-ghost:hover{background:#ddd3b3;}
-  .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);}
-  .btn-small{padding:5px 9px;font-size:11.5px;}
-  .btn-sage{background:var(--sage);color:#0e1c17;}
-
-  input,select,textarea{
-    font-family:'Inter',sans-serif;
-    background:var(--paper-2);
-    border:1px solid var(--line);
-    border-radius:3px;
-    padding:8px 10px;
-    font-size:13px;
-    color:var(--ink);
-    width:100%;
-  }
-  label{font-size:11px;color:var(--ink-soft);font-weight:600;text-transform:none;display:block;margin-bottom:4px;}
-  .field{margin-bottom:12px;}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-
-  table{width:100%;border-collapse:collapse;font-size:13px;}
-  th{
-    text-align:left;font-family:'Roboto Slab',serif;font-weight:600;
-    font-size:11.5px;color:var(--ink-soft);
-    padding:6px 8px;border-bottom:1px solid var(--line);
-  }
-  td{padding:9px 8px;border-bottom:1px solid #d9d0b3;vertical-align:top;}
-  tr:last-child td{border-bottom:none;}
-  tr:hover td{background:rgba(255,255,255,.25);}
-
-  .stamp{
-    display:inline-block;
-    padding:2px 8px;
-    border:1.5px solid;
-    border-radius:3px;
-    font-size:10.5px;
-    font-weight:700;
-    transform:rotate(-1.5deg);
-    letter-spacing:.3px;
-  }
-  .stamp-pend{border-color:#a07a2c;color:#a07a2c;}
-  .stamp-ok{border-color:var(--success);color:var(--success);}
-  .stamp-cancel{border-color:var(--danger);color:var(--danger);}
-
-  .pill{
-    display:inline-block;padding:2px 8px;border-radius:10px;
-    font-size:10.5px;font-weight:600;
-  }
-  .pill-cliente{background:#3a4d6b;color:#cfe0ff;}
-  .pill-proveedor{background:#5a4a2e;color:#f0dcb0;}
-
-  .empty{color:var(--ink-soft);font-size:13px;font-style:italic;padding:14px 4px;}
-
-  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
-  .kpi{
-    background:var(--paper);border-radius:3px;padding:16px 18px;
-  }
-  .kpi .n{font-family:'Roboto Slab',serif;font-size:24px;color:var(--ink);}
-  .kpi .l{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
-  .kpi.warn .n{color:var(--danger);}
-
-  .alert{
-    background:#3a2a1c;border-left:3px solid var(--accent);
-    color:#f0d9ae;padding:10px 14px;border-radius:3px;
-    font-size:12.5px;margin-bottom:14px;
-  }
-  .alert.danger{background:#3a1e1c;border-left-color:var(--danger);color:#f0c0b8;}
-  .alert.info{background:#1c2b3a;border-left-color:#4a8cb4;color:#b8dc00;}
-
-  /* ---- WhatsApp module ---- */
-  .wa-wrap{display:flex;gap:16px;}
-  .wa-chat{
-    flex:1;background:#0d1b17;border-radius:6px;
-    display:flex;flex-direction:column;height:520px;
-    overflow:hidden;
-  }
-  .wa-head{
-    background:#0a2e26;color:#eafff4;padding:12px 16px;
-    font-family:'Roboto Slab',serif;font-size:14px;
-    display:flex;justify-content:space-between;align-items:center;
-  }
-  .wa-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:#0d1b17;}
-  .bubble{max-width:75%;padding:9px 12px;border-radius:8px;font-size:13px;line-height:1.4;}
-  .bubble.cliente{align-self:flex-end;background:#1f6b52;color:#eafff4;border-bottom-right-radius:2px;}
-  .bubble.bot{align-self:flex-start;background:#1c2b33;color:#dbe6e9;border-bottom-left-radius:2px;}
-  .bubble .meta{font-size:9.5px;opacity:.6;margin-top:4px;}
-  .order-card{
-    align-self:flex-start;background:var(--paper-2);color:var(--ink);
-    border-radius:8px;padding:12px 14px;max-width:80%;font-size:12.5px;
-  }
-  .order-card table{margin:8px 0;}
-  .order-card .actions{display:flex;gap:8px;margin-top:10px;}
-  .wa-input{display:flex;gap:8px;padding:10px;background:#0a1611;}
-  .wa-input input{flex:1;}
-  .wa-side{width:280px;flex-shrink:0;}
-
-  ::-webkit-scrollbar{width:8px;}
-  ::-webkit-scrollbar-thumb{background:#2b3341;border-radius:4px;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitácora — Operaciones Comerciales</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Cinzel:wght@700&display=swap');
+    body { font-family: 'Space Grotesk', sans-serif; background-color: #0f1416; color: #e1e7e5; }
+    h1, h2, .brand-font { font-family: 'Cinzel', serif; }
+    .glass-card { background: rgba(22, 30, 33, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); }
+    .accent-bg { background-color: #2a383b; }
+    .accent-btn { background-color: #3b4e53; color: #ffffff; transition: all 0.2s; }
+    .accent-btn:hover { background-color: #4a6268; }
+    .sidebar-item-active { background-color: #2a383b; border-left: 4px solid #81a19f; color: #ffffff; }
+  </style>
 </head>
-<body>
-<div id="app">
-  <nav class="rail">
-    <div class="rail-brand">Bitácora<small>Panel de operaciones comerciales</small></div>
-    <div class="tab active" data-view="resumen"><span class="mono-ico">R</span>Resumen</div>
-    <div class="tab" data-view="agenda"><span class="mono-ico">A</span>Agenda</div>
-    <div class="tab" data-view="calendario"><span class="mono-ico">C</span>Visitas</div>
-    <div class="tab" data-view="inventario"><span class="mono-ico">I</span>Inventario</div>
-    <div class="tab" data-view="finanzas"><span class="mono-ico">$</span>Finanzas</div>
-    <div class="tab" data-view="whatsapp"><span class="mono-ico">W</span>Ventas WhatsApp</div>
-    <div class="tab" data-view="exportar"><span class="mono-ico">E</span>Exportar Excel</div>
-    <div class="rail-foot">Datos guardados en tu almacenamiento local.</div>
-  </nav>
-  <main>
+<body class="flex h-screen overflow-hidden">
 
-    <!-- RESUMEN -->
-    <div class="view active" id="view-resumen">
-      <h1 class="page-title">Resumen general</h1>
-      <div class="page-sub">Estado actual del negocio de un vistazo.</div>
-      <div class="kpi-row" id="kpiRow"></div>
-      <div id="alertsBox"></div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Próximas visitas / viajes</h2></div>
-        <div id="resumenVisitas"></div>
+  <!-- BARRA LATERAL -->
+  <aside class="w-64 glass-card flex flex-col justify-between p-4 z-10">
+    <div>
+      <div class="mb-8 p-2">
+        <h1 class="text-2xl font-bold tracking-wider text-slate-100">Bitácora</h1>
+        <p class="text-xs text-slate-400">Panel de operaciones comerciales</p>
       </div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Últimos movimientos financieros</h2></div>
-        <div id="resumenFinanzas"></div>
-      </div>
+
+      <nav class="space-y-2">
+        <button onclick="switchTab('resumen')" id="btn-resumen" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">R</span>
+          <span>Resumen</span>
+        </button>
+        <button onclick="switchTab('agenda')" id="btn-agenda" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">A</span>
+          <span>Agenda</span>
+        </button>
+        <button onclick="switchTab('visitas')" id="btn-visitas" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">C</span>
+          <span>Visitas</span>
+        </button>
+        <button onclick="switchTab('inventario')" id="btn-inventario" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">I</span>
+          <span>Inventario</span>
+        </button>
+        <button onclick="switchTab('finanzas')" id="btn-finanzas" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">$</span>
+          <span>Finanzas</span>
+        </button>
+        <button onclick="switchTab('exportar')" id="btn-exportar" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">E</span>
+          <span>Exportar Excel</span>
+        </button>
+      </nav>
     </div>
 
-    <!-- AGENDA -->
-    <div class="view" id="view-agenda">
-      <h1 class="page-title">Agenda de contactos</h1>
-      <div class="page-sub">Clientes y proveedores registrados.</div>
-      <div class="sheet">
-        <div class="sheet-head">
-          <h2>Nuevo contacto</h2>
-        </div>
-        <div class="grid3">
-          <div class="field"><label>Tipo</label>
-            <select id="ctTipo"><option value="cliente">Cliente</option><option value="proveedor">Proveedor</option></select>
-          </div>
-          <div class="field"><label>Nombre / Empresa</label><input id="ctNombre" placeholder="Ej. Panadería El Trigo"></div>
-          <div class="field"><label>Teléfono (con código de país)</label><input id="ctTelefono" placeholder="+52 449 123 4567"></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>Correo electrónico</label><input id="ctCorreo" placeholder="correo@ejemplo.com"></div>
-          <div class="field"><label>Notas</label><input id="ctNotas" placeholder="Notas relevantes"></div>
-        </div>
-        <button class="btn-primary" id="btnAddContact">Guardar contacto</button>
-      </div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Clientes</h2></div>
-        <div id="listaClientes"></div>
-      </div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Proveedores</h2></div>
-        <div id="listaProveedores"></div>
-      </div>
+    <div class="p-2 border-t border-slate-700/50 text-xs text-slate-500">
+      Datos guardados en tu almacenamiento local.
     </div>
+  </aside>
 
-    <!-- CALENDARIO -->
-    <div class="view" id="view-calendario">
-      <h1 class="page-title">Calendario de visitas y viajes</h1>
-      <div class="page-sub">Visitas programadas con alertas automáticas según cercanía de fecha.</div>
-      <div id="visitAlertsBanner"></div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Agendar visita / viaje</h2></div>
-        <div id="visitCrossAlert"></div>
-        <div class="grid2">
-          <div class="field"><label>Contacto</label><select id="vsContacto"></select></div>
-          <div class="field"><label>Motivo del viaje o visita</label><input id="vsMotivo" placeholder="Ej. Entrega de pedido o reunión comercial"></div>
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 overflow-y-auto p-8 relative">
+
+    <!-- SECCIÓN: RESUMEN -->
+    <section id="tab-resumen" class="tab-content space-y-6">
+      <h2 class="text-3xl font-bold">Resumen Ejecutivo</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="glass-card p-4 rounded-xl">
+          <p class="text-xs uppercase text-slate-400 font-semibold">Total Ingresos</p>
+          <p id="dash-ingresos" class="text-2xl font-bold text-emerald-400 mt-1">$0.00</p>
         </div>
-        <div class="grid3">
-          <div class="field"><label>Fecha</label><input type="date" id="vsFecha"></div>
-          <div class="field"><label>Hora</label><input type="time" id="vsHora"></div>
-          <div class="field"><label>Estado</label>
-            <select id="vsEstado"><option>Pendiente</option><option>Realizada</option><option>Cancelada</option></select>
+        <div class="glass-card p-4 rounded-xl">
+          <p class="text-xs uppercase text-slate-400 font-semibold">Total Gastos</p>
+          <p id="dash-gastos" class="text-2xl font-bold text-rose-400 mt-1">$0.00</p>
+        </div>
+        <div class="glass-card p-4 rounded-xl">
+          <p class="text-xs uppercase text-slate-400 font-semibold">Utilidad Estimada</p>
+          <p id="dash-utilidad" class="text-2xl font-bold text-amber-400 mt-1">$0.00</p>
+        </div>
+        <div class="glass-card p-4 rounded-xl">
+          <p class="text-xs uppercase text-slate-400 font-semibold">Contactos</p>
+          <p id="dash-contactos" class="text-2xl font-bold text-slate-200 mt-1">0</p>
+        </div>
+      </div>
+      <div class="glass-card p-6 rounded-xl">
+        <h3 class="text-lg font-bold mb-4">Balance General</h3>
+        <canvas id="chartFinanzas" height="100"></canvas>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: AGENDA -->
+    <section id="tab-agenda" class="tab-content space-y-6 hidden">
+      <h2 class="text-3xl font-bold">Directorio de Contactos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-xl space-y-4">
+          <h3 class="text-lg font-bold">Nuevo Contacto</h3>
+          <div>
+            <label class="text-xs text-slate-400">Tipo</label>
+            <select id="agenda-tipo" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+              <option value="Cliente">Cliente</option>
+              <option value="Proveedor">Proveedor</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Nombre o Empresa</label>
+            <input type="text" id="agenda-nombre" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Teléfono</label>
+            <input type="text" id="agenda-telefono" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Correo</label>
+            <input type="email" id="agenda-correo" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Notas</label>
+            <textarea id="agenda-notas" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1 h-20"></textarea>
+          </div>
+          <button onclick="guardarContacto()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Guardar Contacto</button>
+        </div>
+        <div class="md:col-span-2 glass-card p-6 rounded-xl">
+          <h3 class="text-lg font-bold mb-4">Contactos Registrados</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead class="text-xs uppercase bg-slate-800 text-slate-400">
+                <tr>
+                  <th class="p-2">Tipo</th>
+                  <th class="p-2">Nombre</th>
+                  <th class="p-2">Teléfono</th>
+                  <th class="p-2">Correo</th>
+                  <th class="p-2">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-agenda" class="divide-y divide-slate-800"></tbody>
+            </table>
           </div>
         </div>
-        <button class="btn-primary" id="btnAddVisit">Agendar evento</button>
       </div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Visitas programadas</h2></div>
-        <div id="listaVisitas"></div>
-      </div>
-    </div>
+    </section>
 
-    <!-- INVENTARIO -->
-    <div class="view" id="view-inventario">
-      <h1 class="page-title">Inventario</h1>
-      <div class="page-sub">Productos, costos, precios y existencias.</div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Subir producto nuevo</h2></div>
-        <div class="grid3">
-          <div class="field"><label>SKU / ID</label><input id="ivSku" placeholder="Ej. CAM-001"></div>
-          <div class="field"><label>Nombre</label><input id="ivNombre" placeholder="Ej. Camiseta azul"></div>
-          <div class="field"><label>Proveedor asociado</label><select id="ivProveedor"></select></div>
-        </div>
-        <div class="field"><label>Descripción</label><input id="ivDesc" placeholder="Descripción breve"></div>
-        <div class="grid3">
-          <div class="field"><label>Costo de compra</label><input type="number" step="0.01" id="ivCosto" placeholder="0.00"></div>
-          <div class="field"><label>Precio de venta</label><input type="number" step="0.01" id="ivPrecio" placeholder="0.00"></div>
-          <div class="field"><label>Stock inicial</label><input type="number" id="ivStock" placeholder="0"></div>
-        </div>
-        <button class="btn-primary" id="btnAddInv">Guardar producto</button>
-      </div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Catálogo actual</h2></div>
-        <div id="alertStockBox"></div>
-        <div id="listaInventario"></div>
-      </div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Ajustar stock manualmente</h2></div>
-        <div class="grid3">
-          <div class="field"><label>Producto</label><select id="ajSku"></select></div>
-          <div class="field"><label>Movimiento</label>
-            <select id="ajTipo"><option value="entrada">Entrada (compra)</option><option value="salida">Salida (merma/venta)</option></select>
+    <!-- SECCIÓN: VISITAS -->
+    <section id="tab-visitas" class="tab-content space-y-6 hidden">
+      <h2 class="text-3xl font-bold">Bitácora de Visitas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-xl space-y-4">
+          <h3 class="text-lg font-bold">Registrar Visita</h3>
+          <div>
+            <label class="text-xs text-slate-400">Fecha</label>
+            <input type="date" id="visita-fecha" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
-          <div class="field"><label>Cantidad</label><input type="number" id="ajCantidad" placeholder="0"></div>
+          <div>
+            <label class="text-xs text-slate-400">Contacto / Cliente</label>
+            <select id="visita-contacto" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1"></select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Asunto</label>
+            <input type="text" id="visita-asunto" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Acuerdos / Observaciones</label>
+            <textarea id="visita-acuerdos" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1 h-24"></textarea>
+          </div>
+          <button onclick="guardarVisita()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Guardar Visita</button>
         </div>
-        <button class="btn-ghost" id="btnAjustar">Aplicar movimiento</button>
-      </div>
-    </div>
-
-    <!-- FINANZAS -->
-    <div class="view" id="view-finanzas">
-      <h1 class="page-title">Finanzas y contabilidad básica</h1>
-      <div class="page-sub">Ingresos, gastos y balance por rango de fechas.</div>
-      <div class="grid2">
-        <div class="sheet">
-          <div class="sheet-head"><h2>Registrar ingreso</h2></div>
-          <div class="field"><label>Concepto</label><input id="inConcepto" placeholder="Ej. Venta mostrador"></div>
-          <div class="field"><label>Monto</label><input type="number" step="0.01" id="inMonto" placeholder="0.00"></div>
-          <button class="btn-sage btn-small" id="btnAddIngreso">Registrar ingreso</button>
-        </div>
-        <div class="sheet">
-          <div class="sheet-head"><h2>Registrar gasto</h2></div>
-          <div class="field"><label>Concepto</label><input id="gaConcepto" placeholder="Ej. Pago a proveedor"></div>
-          <div class="field"><label>Monto</label><input type="number" step="0.01" id="gaMonto" placeholder="0.00"></div>
-          <button class="btn-danger btn-small" id="btnAddGasto">Registrar gasto</button>
-        </div>
-      </div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Balance por rango de fechas</h2></div>
-        <div class="grid3">
-          <div class="field"><label>Desde</label><input type="date" id="balDesde"></div>
-          <div class="field"><label>Hasta</label><input type="date" id="balHasta"></div>
-          <div class="field" style="display:flex;align-items:flex-end;"><button class="btn-ghost" id="btnCalcBalance">Calcular</button></div>
-        </div>
-        <div id="balanceResult"></div>
-      </div>
-      <div class="sheet">
-        <div class="sheet-head"><h2>Movimientos registrados</h2></div>
-        <div id="listaFinanzas"></div>
-      </div>
-    </div>
-
-    <!-- WHATSAPP -->
-    <div class="view" id="view-whatsapp">
-      <h1 class="page-title">Ventas por WhatsApp</h1>
-      <div class="page-sub">Simulación de conversación con detección automática de productos del inventario.</div>
-      <div class="wa-wrap">
-        <div class="wa-chat">
-          <div class="wa-head"><span id="waClientName">Cliente WhatsApp</span><span style="font-size:11px;opacity:.7;">en línea</span></div>
-          <div class="wa-body" id="waBody"></div>
-          <div class="wa-input">
-            <input id="waInput" placeholder="Ejemplo: Hola, quiero 2 camisas verde">
-            <button class="btn-primary btn-small" id="btnWaSend">Enviar</button>
+        <div class="md:col-span-2 glass-card p-6 rounded-xl">
+          <h3 class="text-lg font-bold mb-4">Historial de Visitas</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead class="text-xs uppercase bg-slate-800 text-slate-400">
+                <tr>
+                  <th class="p-2">Fecha</th>
+                  <th class="p-2">Contacto</th>
+                  <th class="p-2">Asunto</th>
+                  <th class="p-2">Acuerdos</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-visitas" class="divide-y divide-slate-800"></tbody>
+            </table>
           </div>
         </div>
-        <div class="wa-side">
-          <div class="sheet">
-            <div class="sheet-head"><h2>Datos del cliente</h2></div>
-            <div class="field"><label>Nombre</label><input id="waNombreCliente" placeholder="Nombre del cliente" value="Cliente WhatsApp"></div>
-            <div class="field"><label>Vincular a contacto existente (opcional)</label><select id="waContactoLink"></select></div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: INVENTARIO -->
+    <section id="tab-inventario" class="tab-content space-y-6 hidden">
+      <h2 class="text-3xl font-bold">Control de Inventario</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-xl space-y-4">
+          <h3 class="text-lg font-bold">Nuevo Producto</h3>
+          <div>
+            <label class="text-xs text-slate-400">Nombre del Producto</label>
+            <input type="text" id="inv-nombre" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
-          <div class="sheet">
-            <div class="sheet-head"><h2>Cómo funciona</h2></div>
-            <div style="font-size:12px;color:var(--ink-soft);line-height:1.5;">
-              Escribe un mensaje indicando el producto y la cantidad. El sistema buscará coincidencias en tu inventario local, generará la cotización y actualizará el stock al confirmar.
+          <div>
+            <label class="text-xs text-slate-400">Cantidad en Stock</label>
+            <input type="number" id="inv-stock" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Precio Unitario ($)</label>
+            <input type="number" step="0.01" id="inv-precio" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <button onclick="guardarInventario()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Agregar al Inventario</button>
+        </div>
+        <div class="md:col-span-2 glass-card p-6 rounded-xl">
+          <h3 class="text-lg font-bold mb-4">Existencias</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead class="text-xs uppercase bg-slate-800 text-slate-400">
+                <tr>
+                  <th class="p-2">Producto</th>
+                  <th class="p-2">Stock</th>
+                  <th class="p-2">Precio</th>
+                  <th class="p-2">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-inventario" class="divide-y divide-slate-800"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: FINANZAS (ACTUALIZADO) -->
+    <section id="tab-finanzas" class="tab-content space-y-6 hidden">
+      <h2 class="text-3xl font-bold">Gestión Financiera</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-xl space-y-4">
+          <h3 class="text-lg font-bold">Registrar Movimiento</h3>
+          <div>
+            <label class="text-xs text-slate-400">Tipo de Movimiento</label>
+            <select id="fin-tipo" onchange="toggleCamposIngreso()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+              <option value="Ingreso">Ingreso (Venta)</option>
+              <option value="Gasto">Gasto / Egreso</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Fecha de Venta / Movimiento</label>
+            <input type="date" id="fin-fecha" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Concepto / Descripción</label>
+            <input type="text" id="fin-concepto" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Monto Total ($)</label>
+            <input type="number" step="0.01" id="fin-monto" oninput="calcularUtilidad()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          
+          <!-- CAMPOS EXCLUSIVOS DE VENTA / INGRESO -->
+          <div id="wrapper-vendedor" class="space-y-4">
+            <div>
+              <label class="text-xs text-slate-400">Vendedor</label>
+              <input type="text" id="fin-vendedor" placeholder="Nombre del vendedor" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">Porcentaje de Utilidad</label>
+              <select id="fin-utilidad-pct" onchange="calcularUtilidad()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+                <option value="10">10%</option>
+                <option value="11">11%</option>
+                <option value="12">12%</option>
+                <option value="13">13%</option>
+                <option value="14">14%</option>
+                <option value="15" selected>15%</option>
+              </select>
+            </div>
+            <div class="p-2 bg-slate-900/60 rounded border border-slate-800 text-xs flex justify-between">
+              <span class="text-slate-400">Utilidad calculada ($):</span>
+              <span id="lbl-utilidad-monto" class="font-bold text-amber-400">$0.00</span>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- EXPORTACIÓN EXCEL -->
-    <div class="view" id="view-exportar">
-      <h1 class="page-title">Exportación de datos para Excel</h1>
-      <div class="page-sub">Descarga tus registros en formato CSV listo para abrir en Microsoft Excel.</div>
-      
-      <div class="grid2">
-        <div class="sheet">
-          <div class="sheet-head"><h2>Ventas y Gastos (Folios y Lista)</h2></div>
-          <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;line-height:1.4;">
-            Descarga el archivo completo de movimientos financieros indicando ID/Folio, Fecha, Tipo (Ingreso/Gasto), Concepto y Monto.
+          <button onclick="guardarFinanza()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Guardar Registro</button>
+        </div>
+
+        <div class="md:col-span-2 glass-card p-6 rounded-xl">
+          <h3 class="text-lg font-bold mb-4">Historial de Transacciones</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead class="text-xs uppercase bg-slate-800 text-slate-400">
+                <tr>
+                  <th class="p-2">Fecha</th>
+                  <th class="p-2">Tipo</th>
+                  <th class="p-2">Concepto</th>
+                  <th class="p-2">Vendedor</th>
+                  <th class="p-2">Monto</th>
+                  <th class="p-2">Utilidad</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-finanzas" class="divide-y divide-slate-800"></tbody>
+            </table>
           </div>
-          <button class="btn-sage" id="btnExpFinanzas">Descargar Movimientos (.csv)</button>
-        </div>
-
-        <div class="sheet">
-          <div class="sheet-head"><h2>Contactos (Clientes y Proveedores)</h2></div>
-          <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;line-height:1.4;">
-            Obtén el directorio completo clasificado por Tipo (Cliente/Proveedor), Nombre, Teléfono, Correo y Notas.
-          </div>
-          <button class="btn-primary" id="btnExpContactos">Descargar Contactos (.csv)</button>
         </div>
       </div>
+    </section>
 
-      <div class="sheet">
-        <div class="sheet-head"><h2>Órdenes de Venta WhatsApp por Folio</h2></div>
-        <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;line-height:1.4;">
-          Descarga las órdenes de venta procesadas con detalle de Folio de Orden, Cliente, Productos, Total e Historial.
+    <!-- SECCIÓN: EXPORTAR EXCEL -->
+    <section id="tab-exportar" class="tab-content space-y-6 hidden">
+      <h2 class="text-3xl font-bold">Exportar Datos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-card p-6 rounded-xl space-y-3">
+          <h3 class="text-lg font-bold text-emerald-400">Ventas y Gastos</h3>
+          <p class="text-xs text-slate-400">Descarga el reporte de movimientos financieros con fecha, vendedor y utilidades registradas.</p>
+          <button onclick="exportarFinanzasCSV()" class="accent-btn w-full py-2 rounded text-sm font-semibold">Descargar Excel (CSV)</button>
         </div>
-        <button class="btn-ghost" id="btnExpOrdenes">Descargar Órdenes WhatsApp (.csv)</button>
+
+        <div class="glass-card p-6 rounded-xl space-y-3">
+          <h3 class="text-lg font-bold text-sky-400">Contactos</h3>
+          <p class="text-xs text-slate-400">Descarga el directorio completo clasificado por clientes y proveedores.</p>
+          <button onclick="exportarContactosCSV()" class="accent-btn w-full py-2 rounded text-sm font-semibold">Descargar Excel (CSV)</button>
+        </div>
       </div>
-    </div>
+    </section>
 
   </main>
-</div>
 
-<script>
-const state = { contacts:[], visits:[], inventory:[], finance:[], orders:[], counters:{contact:1,visit:1,order:1} };
-let waPendingOrder = null;
+  <script>
+    // ESTADO DE LA APLICACIÓN (LocalStorage)
+    let db = {
+      agenda: JSON.parse(localStorage.getItem('crm_agenda')) || [],
+      visitas: JSON.parse(localStorage.getItem('crm_visitas')) || [],
+      inventario: JSON.parse(localStorage.getItem('crm_inventario')) || [],
+      finanzas: JSON.parse(localStorage.getItem('crm_finanzas')) || []
+    };
 
-function loadAll(){
-  const keys = ['contacts','visits','inventory','finance','orders','counters'];
-  for(const k of keys){
-    try{
-      const r = localStorage.getItem('crm_' + k);
-      if(r) state[k] = JSON.parse(r);
-    }catch(e){ console.error('Error cargando', k, e); }
-  }
-  renderAll();
-}
+    let chartInstance = null;
 
-function save(key){
-  try{ localStorage.setItem('crm_' + key, JSON.stringify(state[key])); }
-  catch(e){ console.error('Error guardando', key, e); }
-}
+    function init() {
+      // Establecer fechas predeterminadas
+      const hoy = new Date().toISOString().split('T')[0];
+      document.getElementById('visita-fecha').value = hoy;
+      document.getElementById('fin-fecha').value = hoy;
 
-function fmt(n){ return '$' + (Number(n)||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function todayISO(){ return new Date().toISOString().slice(0,10); }
-function nowStamp(){ return new Date().toLocaleString('es-MX'); }
-function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-/* ---------------- EXPORTADOR A EXCEL / CSV ---------------- */
-function downloadCSV(filename, csvData) {
-  // \uFEFF añade el Byte Order Mark (BOM) para que Excel reconozca acentos y UTF-8 correctamente
-  const blob = new Blob(["\uFEFF" + csvData], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.setAttribute("href", url);
-  link.setAttribute("download", filename);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-document.getElementById('btnExpFinanzas').addEventListener('click', ()=>{
-  if(!state.finance.length){ alert('No hay registros financieros para exportar.'); return; }
-  let csv = "Folio_ID;Fecha;Tipo;Concepto;Monto;Orden_Asociada\n";
-  state.finance.forEach(f => {
-    const conceptoClean = `"${(f.concepto||'').replace(/"/g, '""')}"`;
-    csv += `${f.id};${f.fecha};${f.tipo.toUpperCase()};${conceptoClean};${f.monto};${f.ordenId||''}\n`;
-  });
-  downloadCSV(`Ventas_y_Gastos_${todayISO()}.csv`, csv);
-});
-
-document.getElementById('btnExpContactos').addEventListener('click', ()=>{
-  if(!state.contacts.length){ alert('No hay contactos registrados para exportar.'); return; }
-  let csv = "ID;Tipo;Nombre_Empresa;Telefono;Correo;Notas\n";
-  state.contacts.forEach(c => {
-    const nombre = `"${(c.nombre||'').replace(/"/g, '""')}"`;
-    const notas = `"${(c.notas||'').replace(/"/g, '""')}"`;
-    csv += `${c.id};${c.tipo.toUpperCase()};${nombre};${c.telefono||''};${c.correo||''};${notas}\n`;
-  });
-  downloadCSV(`Directorio_Clientes_Proveedores_${todayISO()}.csv`, csv);
-});
-
-document.getElementById('btnExpOrdenes').addEventListener('click', ()=>{
-  if(!state.orders.length){ alert('No hay órdenes registradas para exportar.'); return; }
-  let csv = "Folio_Orden;Fecha;Cliente;Productos_Detalle;Total\n";
-  state.orders.forEach(o => {
-    const cliente = `"${(o.contactNombre||'').replace(/"/g, '""')}"`;
-    const prods = `"${o.items.map(i=>`${i.nombre} (x${i.cantidad})`).join(', ').replace(/"/g, '""')}"`;
-    csv += `${o.id};${o.fecha};${cliente};${prods};${o.total}\n`;
-  });
-  downloadCSV(`Ordenes_Ventas_WhatsApp_${todayISO()}.csv`, csv);
-});
-
-/* ---------------- SISTEMA DE ALERTAS DE VISITAS/VIAJES ---------------- */
-function getVisitAlerts(){
-  const hoyStr = todayISO();
-  const hoy = new Date(hoyStr + "T00:00:00");
-  const alertas = [];
-
-  state.visits.forEach(v => {
-    if(v.estado !== 'Pendiente') return;
-    const fVisita = new Date(v.fecha + "T00:00:00");
-    const diffTime = fVisita - hoy;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if(diffDays < 0){
-      alertas.push({ tipo:'danger', texto: `¡ATENCIÓN! La visita/viaje con <b>${esc(v.contactNombre)}</b> (${esc(v.motivo)}) estaba programada para el <b>${v.fecha}</b> y está vencida.` });
-    } else if(diffDays === 0){
-      alertas.push({ tipo:'danger', texto: `<b>HOY TIENES UN VIAJE/VISITA:</b> Con <b>${esc(v.contactNombre)}</b> a las <b>${v.hora}</b> hs (${esc(v.motivo)}).` });
-    } else if(diffDays <= 3){
-      alertas.push({ tipo:'alert', texto: `<b>PRÓXIMO VIAJE/VISITA (${diffDays} días):</b> Con <b>${esc(v.contactNombre)}</b> el <b>${v.fecha}</b> a las <b>${v.hora}</b> (${esc(v.motivo)}).` });
+      renderAgenda();
+      renderVisitas();
+      renderInventario();
+      renderFinanzas();
+      updateDashboard();
+      toggleCamposIngreso();
     }
-  });
 
-  return alertas;
-}
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      
+      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('sidebar-item-active'));
+      document.getElementById(`btn-${tabId}`).classList.add('sidebar-item-active');
 
-/* ---------------- NAV ---------------- */
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('view-'+t.dataset.view).classList.add('active');
-    renderAll();
-  });
-});
-
-/* ---------------- AGENDA ---------------- */
-document.getElementById('btnAddContact').addEventListener('click', ()=>{
-  const nombre = document.getElementById('ctNombre').value.trim();
-  if(!nombre){ alert('El nombre o empresa es obligatorio.'); return; }
-  const c = {
-    id: 'C'+state.counters.contact++,
-    tipo: document.getElementById('ctTipo').value,
-    nombre,
-    telefono: document.getElementById('ctTelefono').value.trim(),
-    correo: document.getElementById('ctCorreo').value.trim(),
-    notas: document.getElementById('ctNotas').value.trim(),
-    historial: [{fecha: nowStamp(), texto:'Contacto creado.'}]
-  };
-  state.contacts.push(c);
-  save('contacts'); save('counters');
-  ['ctNombre','ctTelefono','ctCorreo','ctNotas'].forEach(id=>document.getElementById(id).value='');
-  renderAll();
-});
-
-function contactRow(c){
-  const badge = c.tipo==='cliente' ? '<span class="pill pill-cliente">Cliente</span>' : '<span class="pill pill-proveedor">Proveedor</span>';
-  return `<tr>
-    <td>${badge}<br><b>${esc(c.nombre)}</b></td>
-    <td>${esc(c.telefono)||'—'}</td>
-    <td>${esc(c.correo)||'—'}</td>
-    <td>${esc(c.notas)||'—'}</td>
-    <td>${c.historial.length} evento(s)</td>
-    <td><button class="btn-ghost btn-small" onclick="deleteContact('${c.id}')">Eliminar</button></td>
-  </tr>`;
-}
-window.deleteContact = (id)=>{
-  if(!confirm('¿Eliminar este contacto?')) return;
-  state.contacts = state.contacts.filter(c=>c.id!==id);
-  save('contacts'); renderAll();
-};
-
-function renderAgenda(){
-  const clientes = state.contacts.filter(c=>c.tipo==='cliente');
-  const provs = state.contacts.filter(c=>c.tipo==='proveedor');
-  const head = `<table><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Notas</th><th>Historial</th><th></th></tr>`;
-  document.getElementById('listaClientes').innerHTML = clientes.length
-    ? head + clientes.map(contactRow).join('') + '</table>'
-    : '<div class="empty">Aún no hay clientes registrados.</div>';
-  document.getElementById('listaProveedores').innerHTML = provs.length
-    ? head + provs.map(contactRow).join('') + '</table>'
-    : '<div class="empty">Aún no hay proveedores registrados.</div>';
-}
-
-/* ---------------- CALENDARIO ---------------- */
-function fillContactSelects(){
-  const opts = state.contacts.map(c=>`<option value="${c.id}">${esc(c.nombre)} (${c.tipo})</option>`).join('');
-  ['vsContacto','waContactoLink'].forEach(id=>{
-    const el = document.getElementById(id);
-    const prev = el.value;
-    el.innerHTML = (id==='waContactoLink' ? '<option value="">— Sin vincular —</option>' : '') + opts;
-    if(prev) el.value = prev;
-  });
-  const provOpts = state.contacts.filter(c=>c.tipo==='proveedor').map(c=>`<option value="${c.id}">${esc(c.nombre)}</option>`).join('');
-  document.getElementById('ivProveedor').innerHTML = '<option value="">— Sin especificar —</option>' + provOpts;
-}
-
-document.getElementById('btnAddVisit').addEventListener('click', ()=>{
-  const contactId = document.getElementById('vsContacto').value;
-  const fecha = document.getElementById('vsFecha').value;
-  const hora = document.getElementById('vsHora').value;
-  const motivo = document.getElementById('vsMotivo').value.trim();
-  if(!contactId || !fecha || !hora || !motivo){ alert('Contacto, fecha, hora y motivo son obligatorios.'); return; }
-  const cruce = state.visits.some(v=>v.fecha===fecha && v.hora===hora && v.estado!=='Cancelada');
-  if(cruce && !confirm('Ya existe otra visita en esa fecha y hora. ¿Agendar de todas formas?')) return;
-  const contact = state.contacts.find(c=>c.id===contactId);
-  state.visits.push({
-    id:'V'+state.counters.visit++, contactId, contactNombre: contact?contact.nombre:'—',
-    fecha, hora, motivo, estado: document.getElementById('vsEstado').value
-  });
-  save('visits'); save('counters');
-  document.getElementById('vsMotivo').value='';
-  renderAll();
-});
-
-function stampFor(estado){
-  if(estado==='Realizada') return `<span class="stamp stamp-ok">REALIZADA</span>`;
-  if(estado==='Cancelada') return `<span class="stamp stamp-cancel">CANCELADA</span>`;
-  return `<span class="stamp stamp-pend">PENDIENTE</span>`;
-}
-
-function renderCalendario(){
-  const alerts = getVisitAlerts();
-  const alertBanner = document.getElementById('visitAlertsBanner');
-  alertBanner.innerHTML = alerts.map(a => `<div class="alert ${a.tipo}">${a.texto}</div>`).join('');
-
-  const sorted = [...state.visits].sort((a,b)=> (a.fecha+a.hora).localeCompare(b.fecha+b.hora));
-  if(!sorted.length){ document.getElementById('listaVisitas').innerHTML = '<div class="empty">No hay visitas agendadas.</div>'; return; }
-  let rows = sorted.map(v=>`<tr>
-    <td>${esc(v.fecha)}</td><td>${esc(v.hora)}</td><td>${esc(v.contactNombre)}</td><td>${esc(v.motivo)}</td>
-    <td>${stampFor(v.estado)}</td>
-    <td>
-      <select onchange="updateVisitStatus('${v.id}', this.value)" style="width:auto;display:inline-block;">
-        <option ${v.estado==='Pendiente'?'selected':''}>Pendiente</option>
-        <option ${v.estado==='Realizada'?'selected':''}>Realizada</option>
-        <option ${v.estado==='Cancelada'?'selected':''}>Cancelada</option>
-      </select>
-      <button class="btn-ghost btn-small" onclick="deleteVisit('${v.id}')">Eliminar</button>
-    </td>
-  </tr>`).join('');
-  document.getElementById('listaVisitas').innerHTML = `<table><tr><th>Fecha</th><th>Hora</th><th>Contacto</th><th>Motivo</th><th>Estado</th><th></th></tr>${rows}</table>`;
-}
-window.updateVisitStatus = (id, val)=>{
-  const v = state.visits.find(x=>x.id===id); if(v){ v.estado = val; save('visits'); renderAll(); }
-};
-window.deleteVisit = (id)=>{
-  state.visits = state.visits.filter(v=>v.id!==id); save('visits'); renderAll();
-};
-
-/* ---------------- INVENTARIO ---------------- */
-document.getElementById('btnAddInv').addEventListener('click', ()=>{
-  const sku = document.getElementById('ivSku').value.trim();
-  const nombre = document.getElementById('ivNombre').value.trim();
-  if(!sku || !nombre){ alert('SKU y nombre son obligatorios.'); return; }
-  if(state.inventory.some(p=>p.sku===sku)){ alert('Ya existe un producto con ese SKU.'); return; }
-  state.inventory.push({
-    sku, nombre, descripcion: document.getElementById('ivDesc').value.trim(),
-    costo: Number(document.getElementById('ivCosto').value)||0,
-    precio: Number(document.getElementById('ivPrecio').value)||0,
-    stock: Number(document.getElementById('ivStock').value)||0,
-    proveedorId: document.getElementById('ivProveedor').value,
-    umbral: 5
-  });
-  save('inventory');
-  ['ivSku','ivNombre','ivDesc','ivCosto','ivPrecio','ivStock'].forEach(id=>document.getElementById(id).value='');
-  renderAll();
-});
-
-function fillInvSelects(){
-  const opts = state.inventory.map(p=>`<option value="${p.sku}">${p.sku} — ${esc(p.nombre)} (stock: ${p.stock})</option>`).join('');
-  document.getElementById('ajSku').innerHTML = opts || '<option value="">Sin productos</option>';
-}
-
-document.getElementById('btnAjustar').addEventListener('click', ()=>{
-  const sku = document.getElementById('ajSku').value;
-  const tipo = document.getElementById('ajTipo').value;
-  const cant = Number(document.getElementById('ajCantidad').value);
-  const prod = state.inventory.find(p=>p.sku===sku);
-  if(!prod || !cant || cant<=0){ alert('Selecciona un producto y una cantidad válida.'); return; }
-  if(tipo==='salida' && cant>prod.stock){ alert('La salida excede el stock disponible.'); return; }
-  prod.stock += tipo==='entrada' ? cant : -cant;
-  save('inventory');
-  document.getElementById('ajCantidad').value='';
-  renderAll();
-});
-
-function renderInventario(){
-  const alertBox = document.getElementById('alertStockBox');
-  const bajos = state.inventory.filter(p=>p.stock<=p.umbral);
-  alertBox.innerHTML = bajos.length ? `<div class="alert danger">Stock bajo en: ${bajos.map(p=>esc(p.nombre)+' ('+p.stock+')').join(', ')}.</div>` : '';
-  if(!state.inventory.length){ document.getElementById('listaInventario').innerHTML='<div class="empty">Aún no hay productos en el catálogo.</div>'; return; }
-  const rows = state.inventory.map(p=>{
-    const prov = state.contacts.find(c=>c.id===p.proveedorId);
-    const low = p.stock<=p.umbral ? 'style="color:var(--danger);font-weight:700;"' : '';
-    return `<tr>
-      <td><b>${esc(p.sku)}</b></td><td>${esc(p.nombre)}<br><span style="color:var(--ink-soft);font-size:11.5px;">${esc(p.descripcion)}</span></td>
-      <td>${fmt(p.costo)}</td><td>${fmt(p.precio)}</td>
-      <td ${low}>${p.stock}</td>
-      <td>${prov?esc(prov.nombre):'—'}</td>
-      <td><button class="btn-ghost btn-small" onclick="deleteInv('${p.sku}')">Eliminar</button></td>
-    </tr>`;
-  }).join('');
-  document.getElementById('listaInventario').innerHTML = `<table><tr><th>SKU</th><th>Producto</th><th>Costo</th><th>Precio</th><th>Stock</th><th>Proveedor</th><th></th></tr>${rows}</table>`;
-}
-window.deleteInv = (sku)=>{
-  if(!confirm('¿Eliminar este producto del inventario?')) return;
-  state.inventory = state.inventory.filter(p=>p.sku!==sku); save('inventory'); renderAll();
-};
-
-/* ---------------- FINANZAS ---------------- */
-function addFinance(tipo, concepto, monto, ordenId){
-  if(!concepto || !monto || monto<=0) return false;
-  state.finance.push({id:'F'+Date.now()+Math.floor(Math.random()*999), tipo, concepto, monto:Number(monto), fecha: todayISO(), ordenId: ordenId||null});
-  save('finance');
-  return true;
-}
-document.getElementById('btnAddIngreso').addEventListener('click', ()=>{
-  const ok = addFinance('ingreso', document.getElementById('inConcepto').value.trim(), Number(document.getElementById('inMonto').value));
-  if(!ok){ alert('Concepto y monto son obligatorios.'); return; }
-  document.getElementById('inConcepto').value=''; document.getElementById('inMonto').value='';
-  renderAll();
-});
-document.getElementById('btnAddGasto').addEventListener('click', ()=>{
-  const ok = addFinance('gasto', document.getElementById('gaConcepto').value.trim(), Number(document.getElementById('gaMonto').value));
-  if(!ok){ alert('Concepto y monto son obligatorios.'); return; }
-  document.getElementById('gaConcepto').value=''; document.getElementById('gaMonto').value='';
-  renderAll();
-});
-document.getElementById('btnCalcBalance').addEventListener('click', ()=>{
-  const desde = document.getElementById('balDesde').value;
-  const hasta = document.getElementById('balHasta').value;
-  if(!desde || !hasta){ alert('Selecciona ambas fechas.'); return; }
-  const rango = state.finance.filter(f=>f.fecha>=desde && f.fecha<=hasta);
-  const ingresos = rango.filter(f=>f.tipo==='ingreso').reduce((s,f)=>s+f.monto,0);
-  const gastos = rango.filter(f=>f.tipo==='gasto').reduce((s,f)=>s+f.monto,0);
-  const utilidad = ingresos-gastos;
-  document.getElementById('balanceResult').innerHTML = `
-    <div class="kpi-row" style="grid-template-columns:1fr 1fr 1fr;margin-top:10px;">
-      <div class="kpi"><div class="n">${fmt(ingresos)}</div><div class="l">Ingresos</div></div>
-      <div class="kpi"><div class="n">${fmt(gastos)}</div><div class="l">Gastos</div></div>
-      <div class="kpi ${utilidad<0?'warn':''}"><div class="n">${fmt(utilidad)}</div><div class="l">Utilidad neta</div></div>
-    </div>`;
-});
-
-function renderFinanzas(){
-  if(!state.finance.length){ document.getElementById('listaFinanzas').innerHTML='<div class="empty">Aún no hay movimientos registrados.</div>'; return; }
-  const rows = [...state.finance].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(f=>`<tr>
-    <td>${esc(f.fecha)}</td>
-    <td>${f.tipo==='ingreso'?'<span class="stamp stamp-ok">INGRESO</span>':'<span class="stamp stamp-cancel">GASTO</span>'}</td>
-    <td>${esc(f.concepto)}</td><td>${fmt(f.monto)}</td><td>${f.ordenId?esc(f.ordenId):'—'}</td>
-  </tr>`).join('');
-  document.getElementById('listaFinanzas').innerHTML = `<table><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Monto</th><th>Orden</th></tr>${rows}</table>`;
-}
-
-/* ---------------- RESUMEN ---------------- */
-function renderResumen(){
-  const stockBajo = state.inventory.filter(p=>p.stock<=p.umbral).length;
-  const pendientes = state.visits.filter(v=>v.estado==='Pendiente').length;
-  const ingresos = state.finance.filter(f=>f.tipo==='ingreso').reduce((s,f)=>s+f.monto,0);
-  const gastos = state.finance.filter(f=>f.tipo==='gasto').reduce((s,f)=>s+f.monto,0);
-  document.getElementById('kpiRow').innerHTML = `
-    <div class="kpi"><div class="n">${state.contacts.length}</div><div class="l">Contactos totales</div></div>
-    <div class="kpi"><div class="n">${pendientes}</div><div class="l">Visitas pendientes</div></div>
-    <div class="kpi ${stockBajo?'warn':''}"><div class="n">${stockBajo}</div><div class="l">Productos con stock bajo</div></div>
-    <div class="kpi ${ (ingresos-gastos)<0 ? 'warn':''}"><div class="n">${fmt(ingresos-gastos)}</div><div class="l">Utilidad neta acumulada</div></div>
-  `;
-  const alertsHtml = [];
-  const visitAlerts = getVisitAlerts();
-  visitAlerts.forEach(a => alertsHtml.push(`<div class="alert ${a.tipo}">${a.texto}</div>`));
-
-  const bajos = state.inventory.filter(p=>p.stock<=p.umbral);
-  if(bajos.length) alertsHtml.push(`<div class="alert danger">Stock bajo en productos: ${bajos.map(p=>esc(p.nombre)).join(', ')}.</div>`);
-  
-  document.getElementById('alertsBox').innerHTML = alertsHtml.join('');
-
-  const prox = [...state.visits].filter(v=>v.estado==='Pendiente').sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora)).slice(0,5);
-  document.getElementById('resumenVisitas').innerHTML = prox.length
-    ? `<table><tr><th>Fecha</th><th>Hora</th><th>Contacto</th><th>Motivo</th></tr>${prox.map(v=>`<tr><td>${esc(v.fecha)}</td><td>${esc(v.hora)}</td><td>${esc(v.contactNombre)}</td><td>${esc(v.motivo)}</td></tr>`).join('')}</table>`
-    : '<div class="empty">No hay visitas pendientes.</div>';
-
-  const ult = [...state.finance].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,5);
-  document.getElementById('resumenFinanzas').innerHTML = ult.length
-    ? `<table><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Monto</th></tr>${ult.map(f=>`<tr><td>${esc(f.fecha)}</td><td>${f.tipo}</td><td>${esc(f.concepto)}</td><td>${fmt(f.monto)}</td></tr>`).join('')}</table>`
-    : '<div class="empty">No hay movimientos aún.</div>';
-}
-
-/* ---------------- WHATSAPP / VENTAS ---------------- */
-function waAppend(html){
-  const body = document.getElementById('waBody');
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  body.appendChild(div.firstElementChild);
-  body.scrollTop = body.scrollHeight;
-}
-function waBubble(from, text){
-  waAppend(`<div class="bubble ${from}">${esc(text)}<div class="meta">${nowStamp()}</div></div>`);
-}
-
-document.getElementById('btnWaSend').addEventListener('click', handleWaSend);
-document.getElementById('waInput').addEventListener('keydown', e=>{ if(e.key==='Enter') handleWaSend(); });
-
-function handleWaSend(){
-  const input = document.getElementById('waInput');
-  const msg = input.value.trim();
-  if(!msg) return;
-  input.value='';
-  waBubble('cliente', msg);
-  procesarIntencionLocal(msg);
-}
-
-function procesarIntencionLocal(msg){
-  if(!state.inventory.length){
-    waBubble('bot','Por ahora no hay productos cargados en el inventario. Agrega productos en la pestaña "Inventario" para poder cotizar.');
-    return;
-  }
-
-  const msgClean = msg.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const nums = msgClean.match(/\d+/g);
-  const cantidad = nums ? parseInt(nums[0], 10) : 1;
-
-  let prodEncontrado = null;
-  for(const prod of state.inventory){
-    const nombreClean = prod.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const skuClean = prod.sku.toLowerCase();
-    
-    const palabras = nombreClean.split(' ');
-    const coincide = palabras.some(p => p.length > 2 && msgClean.includes(p)) || msgClean.includes(skuClean);
-
-    if(coincide){
-      prodEncontrado = prod;
-      break;
+      if(tabId === 'resumen') updateDashboard();
     }
-  }
 
-  if(!prodEncontrado){
-    const prodsEjemplo = state.inventory.slice(0, 3).map(p => p.nombre).join(', ');
-    waBubble('bot', `No logré identificar el producto que buscas. Por favor especifica el nombre exacto. Ejemplo de productos disponibles: ${prodsEjemplo}.`);
-    return;
-  }
+    // --- MANEJO DE FINANZAS Y UTILIDADES ---
+    function toggleCamposIngreso() {
+      const tipo = document.getElementById('fin-tipo').value;
+      const wrapper = document.getElementById('wrapper-vendedor');
+      if (tipo === 'Gasto') {
+        wrapper.classList.add('hidden');
+      } else {
+        wrapper.classList.remove('hidden');
+      }
+    }
 
-  if(prodEncontrado.stock < cantidad){
-    waBubble('bot', `No tenemos suficiente stock de ${prodEncontrado.nombre}. Disponibles: ${prodEncontrado.stock}, solicitados: ${cantidad}.`);
-    return;
-  }
+    function calcularUtilidad() {
+      const monto = parseFloat(document.getElementById('fin-monto').value) || 0;
+      const pct = parseFloat(document.getElementById('fin-utilidad-pct').value) || 0;
+      const utilidadMonto = monto * (pct / 100);
+      document.getElementById('lbl-utilidad-monto').innerText = `$${utilidadMonto.toFixed(2)}`;
+      return utilidadMonto;
+    }
 
-  const resueltos = [{ sku: prodEncontrado.sku, nombre: prodEncontrado.nombre, cantidad, precio: prodEncontrado.precio }];
-  const total = cantidad * prodEncontrado.precio;
+    function guardarFinanza() {
+      const tipo = document.getElementById('fin-tipo').value;
+      const fecha = document.getElementById('fin-fecha').value;
+      const concepto = document.getElementById('fin-concepto').value.trim();
+      const monto = parseFloat(document.getElementById('fin-monto').value);
+      const vendedor = document.getElementById('fin-vendedor').value.trim();
+      const pct = parseFloat(document.getElementById('fin-utilidad-pct').value);
 
-  waPendingOrder = { items: resueltos, total };
+      if(!concepto || isNaN(monto) || !fecha) return alert('Por favor completa la fecha, concepto y monto.');
 
-  const rows = resueltos.map(i=>`<tr><td>${esc(i.nombre)}</td><td>${i.cantidad}</td><td>${fmt(i.precio)}</td><td>${fmt(i.cantidad*i.precio)}</td></tr>`).join('');
-  waAppend(`<div class="order-card">
-    <b>Resumen del pedido</b>
-    <table><tr><th>Producto</th><th>Cant.</th><th>P. unit.</th><th>Subtotal</th></tr>${rows}</table>
-    <b>Total: ${fmt(total)}</b>
-    <div class="actions">
-      <button class="btn-sage btn-small" onclick="confirmarOrden()">Confirmar pedido</button>
-      <button class="btn-ghost btn-small" onclick="cancelarOrden()">Cancelar</button>
-    </div>
-  </div>`);
-}
+      let utilidadCalculada = 0;
+      if (tipo === 'Ingreso') {
+        utilidadCalculada = monto * (pct / 100);
+      }
 
-window.cancelarOrden = ()=>{
-  waPendingOrder = null;
-  waBubble('bot','Pedido cancelado. Avísame si deseas ordenar algo más.');
-};
+      const registro = {
+        id: Date.now(),
+        fecha: fecha,
+        tipo: tipo,
+        concepto: concepto,
+        monto: monto,
+        vendedor: tipo === 'Ingreso' ? (vendedor || 'N/A') : '-',
+        utilidadPct: tipo === 'Ingreso' ? pct : 0,
+        utilidadMonto: tipo === 'Ingreso' ? utilidadCalculada : 0
+      };
 
-window.confirmarOrden = ()=>{
-  if(!waPendingOrder) return;
-  const nombreCliente = document.getElementById('waNombreCliente').value.trim() || 'Cliente WhatsApp';
-  const contactId = document.getElementById('waContactoLink').value || null;
+      db.finanzas.push(registro);
+      localStorage.setItem('crm_finanzas', JSON.stringify(db.finanzas));
 
-  for(const it of waPendingOrder.items){
-    const prod = state.inventory.find(p=>p.sku===it.sku);
-    if(prod) prod.stock -= it.cantidad;
-  }
-  save('inventory');
+      // Limpiar formulario
+      document.getElementById('fin-concepto').value = '';
+      document.getElementById('fin-monto').value = '';
+      document.getElementById('fin-vendedor').value = '';
+      calcularUtilidad();
 
-  const orderId = state.counters.order++;
-  const orden = { id:'ORD-'+orderId, contactId, contactNombre: nombreCliente, items: waPendingOrder.items, total: waPendingOrder.total, estado:'Confirmada', fecha: todayISO() };
-  state.orders.push(orden);
-  save('orders'); save('counters');
+      renderFinanzas();
+      updateDashboard();
+    }
 
-  addFinance('ingreso', `Venta WhatsApp orden #${orderId} — ${nombreCliente}`, waPendingOrder.total, orden.id);
+    function renderFinanzas() {
+      const tbody = document.getElementById('tabla-finanzas');
+      tbody.innerHTML = '';
+      db.finanzas.forEach(f => {
+        const esIngreso = f.tipo === 'Ingreso';
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 text-slate-400 text-xs">${f.fecha}</td>
+            <td class="p-2 font-semibold ${esIngreso ? 'text-emerald-400' : 'text-rose-400'}">${f.tipo}</td>
+            <td class="p-2">${f.concepto}</td>
+            <td class="p-2 text-slate-300">${f.vendedor || '-'}</td>
+            <td class="p-2 font-bold">$${f.monto.toFixed(2)}</td>
+            <td class="p-2 text-xs ${esIngreso ? 'text-amber-400' : 'text-slate-500'}">
+              ${esIngreso ? `${f.utilidadPct}% ($${f.utilidadMonto.toFixed(2)})` : '-'}
+            </td>
+          </tr>
+        `;
+      });
+    }
 
-  if(contactId){
-    const c = state.contacts.find(x=>x.id===contactId);
-    if(c){ c.historial.push({fecha: nowStamp(), texto:`Compra confirmada, orden ${orden.id} por ${fmt(orden.total)}.`}); save('contacts'); }
-  }
+    // --- AGENDA / CONTACTOS ---
+    function guardarContacto() {
+      const tipo = document.getElementById('agenda-tipo').value;
+      const nombre = document.getElementById('agenda-nombre').value.trim();
+      const telefono = document.getElementById('agenda-telefono').value.trim();
+      const correo = document.getElementById('agenda-correo').value.trim();
+      const notas = document.getElementById('agenda-notas').value.trim();
 
-  const detalle = waPendingOrder.items.map(i=>`${i.nombre} x${i.cantidad}`).join(', ');
-  const msg = `¡Hola ${nombreCliente}! Tu orden #${orderId} ha sido aceptada con éxito. Detalle: ${detalle}. Total: ${fmt(waPendingOrder.total)}. Pronto nos comunicaremos para la entrega.`;
-  waBubble('bot', msg);
+      if(!nombre) return alert('El nombre es obligatorio.');
 
-  waPendingOrder = null;
-  renderAll();
-};
+      db.agenda.push({ id: Date.now(), tipo, nombre, telefono, correo, notas });
+      localStorage.setItem('crm_agenda', JSON.stringify(db.agenda));
 
-document.getElementById('waContactoLink').addEventListener('change', function(){
-  const c = state.contacts.find(x=>x.id===this.value);
-  if(c) document.getElementById('waNombreCliente').value = c.nombre;
-});
+      document.getElementById('agenda-nombre').value = '';
+      document.getElementById('agenda-telefono').value = '';
+      document.getElementById('agenda-correo').value = '';
+      document.getElementById('agenda-notas').value = '';
 
-/* ---------------- RENDER ALL ---------------- */
-function renderAll(){
-  fillContactSelects();
-  fillInvSelects();
-  renderResumen();
-  renderAgenda();
-  renderCalendario();
-  renderInventario();
-  renderFinanzas();
-}
+      renderAgenda();
+      updateDashboard();
+    }
 
-loadAll();
-</script>
+    function renderAgenda() {
+      const tbody = document.getElementById('tabla-agenda');
+      const selectVisita = document.getElementById('visita-contacto');
+      tbody.innerHTML = '';
+      selectVisita.innerHTML = '<option value="">-- Seleccionar --</option>';
+
+      db.agenda.forEach(c => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 text-xs font-semibold ${c.tipo === 'Cliente' ? 'text-sky-400' : 'text-purple-400'}">${c.tipo}</td>
+            <td class="p-2 font-medium">${c.nombre}</td>
+            <td class="p-2">${c.telefono}</td>
+            <td class="p-2">${c.correo}</td>
+            <td class="p-2">
+              <button onclick="eliminarContacto(${c.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button>
+            </td>
+          </tr>
+        `;
+        selectVisita.innerHTML += `<option value="${c.nombre}">${c.nombre} (${c.tipo})</option>`;
+      });
+    }
+
+    function eliminarContacto(id) {
+      db.agenda = db.agenda.filter(c => c.id !== id);
+      localStorage.setItem('crm_agenda', JSON.stringify(db.agenda));
+      renderAgenda();
+      updateDashboard();
+    }
+
+    // --- VISITAS ---
+    function guardarVisita() {
+      const fecha = document.getElementById('visita-fecha').value;
+      const contacto = document.getElementById('visita-contacto').value;
+      const asunto = document.getElementById('visita-asunto').value.trim();
+      const acuerdos = document.getElementById('visita-acuerdos').value.trim();
+
+      if(!asunto) return alert('Ingresa el asunto de la visita.');
+
+      db.visitas.push({ id: Date.now(), fecha, contacto: contacto || 'Anónimo', asunto, acuerdos });
+      localStorage.setItem('crm_visitas', JSON.stringify(db.visitas));
+
+      document.getElementById('visita-asunto').value = '';
+      document.getElementById('visita-acuerdos').value = '';
+
+      renderVisitas();
+    }
+
+    function renderVisitas() {
+      const tbody = document.getElementById('tabla-visitas');
+      tbody.innerHTML = '';
+      db.visitas.forEach(v => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 text-xs text-slate-400">${v.fecha}</td>
+            <td class="p-2 font-medium">${v.contacto}</td>
+            <td class="p-2">${v.asunto}</td>
+            <td class="p-2 text-xs text-slate-400">${v.acuerdos}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // --- INVENTARIO ---
+    function guardarInventario() {
+      const nombre = document.getElementById('inv-nombre').value.trim();
+      const stock = parseInt(document.getElementById('inv-stock').value);
+      const precio = parseFloat(document.getElementById('inv-precio').value);
+
+      if(!nombre || isNaN(stock) || isNaN(precio)) return alert('Completa todos los datos del producto.');
+
+      db.inventario.push({ id: Date.now(), nombre, stock, precio });
+      localStorage.setItem('crm_inventario', JSON.stringify(db.inventario));
+
+      document.getElementById('inv-nombre').value = '';
+      document.getElementById('inv-stock').value = '';
+      document.getElementById('inv-precio').value = '';
+
+      renderInventario();
+    }
+
+    function renderInventario() {
+      const tbody = document.getElementById('tabla-inventario');
+      tbody.innerHTML = '';
+      db.inventario.forEach(i => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 font-medium">${i.nombre}</td>
+            <td class="p-2">${i.stock} pza(s)</td>
+            <td class="p-2 font-bold text-emerald-400">$${i.precio.toFixed(2)}</td>
+            <td class="p-2">
+              <button onclick="eliminarInventario(${i.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function eliminarInventario(id) {
+      db.inventario = db.inventario.filter(i => i.id !== id);
+      localStorage.setItem('crm_inventario', JSON.stringify(db.inventario));
+      renderInventario();
+    }
+
+    // --- EXPORTACIÓN CSV PARA EXCEL ---
+    function descargarCSV(contenido, nombreArchivo) {
+      const blob = new Blob(["\uFEFF" + contenido], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", nombreArchivo);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function exportarFinanzasCSV() {
+      if(db.finanzas.length === 0) return alert('No hay datos financieros para exportar.');
+      let csv = 'ID,Fecha,Tipo,Concepto,Vendedor,Monto,Utilidad_Porcentaje,Utilidad_Monto\n';
+      db.finanzas.forEach(f => {
+        csv += `"${f.id}","${f.fecha}","${f.tipo}","${f.concepto}","${f.vendedor || '-'}","${f.monto}","${f.utilidadPct || 0}%","${f.utilidadMonto || 0}"\n`;
+      });
+      descargarCSV(csv, `finanzas_${new Date().toISOString().split('T')[0]}.csv`);
+    }
+
+    function exportarContactosCSV() {
+      if(db.agenda.length === 0) return alert('No hay contactos registrados.');
+      let csv = 'ID,Tipo,Nombre,Telefono,Correo,Notas\n';
+      db.agenda.forEach(c => {
+        csv += `"${c.id}","${c.tipo}","${c.nombre}","${c.telefono}","${c.correo}","${c.notas}"\n`;
+      });
+      descargarCSV(csv, `contactos_${new Date().toISOString().split('T')[0]}.csv`);
+    }
+
+    // --- DASHBOARD Y GRÁFICA ---
+    function updateDashboard() {
+      const ingresos = db.finanzas.filter(f => f.tipo === 'Ingreso').reduce((a, b) => a + b.monto, 0);
+      const gastos = db.finanzas.filter(f => f.tipo === 'Gasto').reduce((a, b) => a + b.monto, 0);
+      const utilidadTotal = db.finanzas.filter(f => f.tipo === 'Ingreso').reduce((a, b) => a + (b.utilidadMonto || 0), 0);
+
+      document.getElementById('dash-ingresos').innerText = `$${ingresos.toFixed(2)}`;
+      document.getElementById('dash-gastos').innerText = `$${gastos.toFixed(2)}`;
+      document.getElementById('dash-utilidad').innerText = `$${utilidadTotal.toFixed(2)}`;
+      document.getElementById('dash-contactos').innerText = db.agenda.length;
+
+      renderChart(ingresos, gastos, utilidadTotal);
+    }
+
+    function renderChart(ingresos, gastos, utilidad) {
+      const ctx = document.getElementById('chartFinanzas').getContext('2d');
+      if(chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Ingresos Totales', 'Gastos Totales', 'Utilidad Ganada'],
+          datasets: [{
+            label: 'Monto en USD/MXN',
+            data: [ingresos, gastos, utilidad],
+            backgroundColor: ['#34d399', '#f87171', '#fbbf24']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // Iniciar al cargar
+    window.onload = init;
+  </script>
 </body>
 </html>
