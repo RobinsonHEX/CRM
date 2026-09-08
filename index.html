@@ -18,34 +18,6 @@
 </head>
 <body class="flex h-screen overflow-hidden">
 
-  <!-- MODAL DE LOGIN / AUTENTICACIÓN -->
-  <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="glass-card p-8 rounded-2xl w-full max-w-md space-y-6">
-      <div class="text-center">
-        <h2 id="auth-title" class="text-2xl font-bold text-white">Iniciar Sesión</h2>
-        <p class="text-xs text-slate-400 mt-1">Ingresa tus credenciales para acceder al CRM</p>
-      </div>
-
-      <div class="space-y-4">
-        <div>
-          <label class="text-xs text-slate-400">Correo Electrónico</label>
-          <input type="email" id="auth-email" placeholder="usuario@empresa.com" class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-sm mt-1 focus:outline-none focus:border-slate-500">
-        </div>
-        <div>
-          <label class="text-xs text-slate-400">Contraseña</label>
-          <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-sm mt-1 focus:outline-none focus:border-slate-500">
-        </div>
-
-        <button onclick="ejecutarAuth()" id="auth-btn-submit" class="w-full accent-btn py-3 rounded-lg text-sm font-semibold">Iniciar Sesión</button>
-      </div>
-
-      <div class="text-center text-xs text-slate-400">
-        <span id="auth-toggle-text">¿No tienes cuenta?</span>
-        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-sky-400 hover:underline font-semibold ml-1">Registrarse</button>
-      </div>
-    </div>
-  </div>
-
   <!-- BARRA LATERAL -->
   <aside class="w-64 glass-card flex flex-col justify-between p-4 z-10">
     <div>
@@ -59,13 +31,17 @@
           <span class="font-bold text-xs uppercase tracking-widest text-slate-400">R</span>
           <span>Resumen</span>
         </button>
-        <button onclick="switchTab('agenda')" id="btn-agenda" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
-          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">A</span>
-          <span>Agenda</span>
-        </button>
-        <button onclick="switchTab('visitas')" id="btn-visitas" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+        <button onclick="switchTab('clientes')" id="btn-clientes" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
           <span class="font-bold text-xs uppercase tracking-widest text-slate-400">C</span>
-          <span>Visitas</span>
+          <span>Clientes</span>
+        </button>
+        <button onclick="switchTab('proveedores')" id="btn-proveedores" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">P</span>
+          <span>Proveedores</span>
+        </button>
+        <button onclick="switchTab('calendario')" id="btn-calendario" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+          <span class="font-bold text-xs uppercase tracking-widest text-slate-400">K</span>
+          <span>Calendario</span>
         </button>
         <button onclick="switchTab('inventario')" id="btn-inventario" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
           <span class="font-bold text-xs uppercase tracking-widest text-slate-400">I</span>
@@ -73,34 +49,29 @@
         </button>
         <button onclick="switchTab('finanzas')" id="btn-finanzas" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
           <span class="font-bold text-xs uppercase tracking-widest text-slate-400">$</span>
-          <span>Finanzas</span>
+          <span>Ventas y Compras</span>
         </button>
-        <button onclick="switchTab('exportar')" id="btn-exportar" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+        <button onclick="switchTab('respaldos')" id="btn-respaldos" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
           <span class="font-bold text-xs uppercase tracking-widest text-slate-400">E</span>
-          <span>Exportar Excel</span>
+          <span>Datos y Respaldos</span>
         </button>
       </nav>
-    </div>
-
-    <div class="p-2 border-t border-slate-700/50 space-y-2">
-      <div id="user-info" class="text-xs text-slate-400 truncate">No autenticado</div>
-      <button onclick="cerrarSesion()" class="w-full text-left text-xs text-rose-400 hover:underline">Cerrar Sesión</button>
     </div>
   </aside>
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 overflow-y-auto p-8 relative">
 
-    <!-- SECCIÓN: RESUMEN -->
+    <!-- RESUMEN -->
     <section id="tab-resumen" class="tab-content space-y-6">
       <h2 class="text-3xl font-bold">Resumen Ejecutivo</h2>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="glass-card p-4 rounded-xl">
-          <p class="text-xs uppercase text-slate-400 font-semibold">Total Ingresos</p>
+          <p class="text-xs uppercase text-slate-400 font-semibold">Total Ventas</p>
           <p id="dash-ingresos" class="text-2xl font-bold text-emerald-400 mt-1">$0.00</p>
         </div>
         <div class="glass-card p-4 rounded-xl">
-          <p class="text-xs uppercase text-slate-400 font-semibold">Total Gastos</p>
+          <p class="text-xs uppercase text-slate-400 font-semibold">Total Compras / Gastos</p>
           <p id="dash-gastos" class="text-2xl font-bold text-rose-400 mt-1">$0.00</p>
         </div>
         <div class="glass-card p-4 rounded-xl">
@@ -108,7 +79,7 @@
           <p id="dash-utilidad" class="text-2xl font-bold text-amber-400 mt-1">$0.00</p>
         </div>
         <div class="glass-card p-4 rounded-xl">
-          <p class="text-xs uppercase text-slate-400 font-semibold">Contactos</p>
+          <p class="text-xs uppercase text-slate-400 font-semibold">Total Clientes</p>
           <p id="dash-contactos" class="text-2xl font-bold text-slate-200 mt-1">0</p>
         </div>
       </div>
@@ -118,101 +89,161 @@
       </div>
     </section>
 
-    <!-- SECCIÓN: AGENDA -->
-    <section id="tab-agenda" class="tab-content space-y-6 hidden">
-      <h2 class="text-3xl font-bold">Directorio de Contactos</h2>
+    <!-- CLIENTES -->
+    <section id="tab-clientes" class="tab-content space-y-6 hidden">
+      <h2 class="text-3xl font-bold">Directorio de Clientes</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="glass-card p-6 rounded-xl space-y-4">
-          <h3 class="text-lg font-bold">Nuevo Contacto</h3>
+          <h3 class="text-lg font-bold">Nuevo Cliente</h3>
           <div>
-            <label class="text-xs text-slate-400">Tipo</label>
-            <select id="agenda-tipo" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
-              <option value="Cliente">Cliente</option>
-              <option value="Proveedor">Proveedor</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-xs text-slate-400">Nombre o Empresa</label>
-            <input type="text" id="agenda-nombre" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+            <label class="text-xs text-slate-400">Nombre / Empresa</label>
+            <input type="text" id="cliente-nombre" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
           <div>
             <label class="text-xs text-slate-400">Teléfono</label>
-            <input type="text" id="agenda-telefono" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+            <input type="text" id="cliente-telefono" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
           <div>
-            <label class="text-xs text-slate-400">Correo</label>
-            <input type="email" id="agenda-correo" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+            <label class="text-xs text-slate-400">Correo Electrónico</label>
+            <input type="email" id="cliente-correo" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
           <div>
-            <label class="text-xs text-slate-400">Notas</label>
-            <textarea id="agenda-notas" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1 h-20"></textarea>
+            <label class="text-xs text-slate-400">Notas / Preferencias</label>
+            <textarea id="cliente-notas" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1 h-20"></textarea>
           </div>
-          <button onclick="guardarContacto()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Guardar Contacto</button>
+          <button onclick="guardarCliente()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Guardar Cliente</button>
         </div>
+
         <div class="md:col-span-2 glass-card p-6 rounded-xl">
-          <h3 class="text-lg font-bold mb-4">Contactos Registrados</h3>
+          <h3 class="text-lg font-bold mb-4">Lista de Clientes</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-300">
               <thead class="text-xs uppercase bg-slate-800 text-slate-400">
                 <tr>
-                  <th class="p-2">Tipo</th>
                   <th class="p-2">Nombre</th>
                   <th class="p-2">Teléfono</th>
                   <th class="p-2">Correo</th>
+                  <th class="p-2">Notas</th>
                   <th class="p-2">Acción</th>
                 </tr>
               </thead>
-              <tbody id="tabla-agenda" class="divide-y divide-slate-800"></tbody>
+              <tbody id="tabla-clientes" class="divide-y divide-slate-800"></tbody>
             </table>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SECCIÓN: VISITAS -->
-    <section id="tab-visitas" class="tab-content space-y-6 hidden">
-      <h2 class="text-3xl font-bold">Bitácora de Visitas</h2>
+    <!-- PROVEEDORES -->
+    <section id="tab-proveedores" class="tab-content space-y-6 hidden">
+      <h2 class="text-3xl font-bold">Directorio de Proveedores</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="glass-card p-6 rounded-xl space-y-4">
-          <h3 class="text-lg font-bold">Registrar Visita</h3>
+          <h3 class="text-lg font-bold">Nuevo Proveedor</h3>
           <div>
-            <label class="text-xs text-slate-400">Fecha</label>
-            <input type="date" id="visita-fecha" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+            <label class="text-xs text-slate-400">Nombre / Empresa</label>
+            <input type="text" id="prov-nombre" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
           <div>
-            <label class="text-xs text-slate-400">Contacto / Cliente</label>
-            <select id="visita-contacto" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1"></select>
+            <label class="text-xs text-slate-400">Teléfono</label>
+            <input type="text" id="prov-telefono" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
           <div>
-            <label class="text-xs text-slate-400">Asunto</label>
-            <input type="text" id="visita-asunto" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+            <label class="text-xs text-slate-400">Página Web</label>
+            <input type="url" id="prov-web" placeholder="https://ejemplo.com" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
           <div>
-            <label class="text-xs text-slate-400">Acuerdos / Observaciones</label>
-            <textarea id="visita-acuerdos" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1 h-24"></textarea>
+            <label class="text-xs text-slate-400">¿Tiene Ubicación Física en Aguascalientes?</label>
+            <select id="prov-ags" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+              <option value="Sí">Sí</option>
+              <option value="No">No</option>
+            </select>
           </div>
-          <button onclick="guardarVisita()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Guardar Visita</button>
+          <div>
+            <label class="text-xs text-slate-400">Dirección Línea 1</label>
+            <input type="text" id="prov-dir1" placeholder="Calle y número" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Dirección Línea 2</label>
+            <input type="text" id="prov-dir2" placeholder="Colonia / Código Postal" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Dirección Línea 3</label>
+            <input type="text" id="prov-dir3" placeholder="Ciudad / Estado / Referencia" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <button onclick="guardarProveedor()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Guardar Proveedor</button>
         </div>
+
         <div class="md:col-span-2 glass-card p-6 rounded-xl">
-          <h3 class="text-lg font-bold mb-4">Historial de Visitas</h3>
+          <h3 class="text-lg font-bold mb-4">Lista de Proveedores</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-300">
               <thead class="text-xs uppercase bg-slate-800 text-slate-400">
                 <tr>
-                  <th class="p-2">Fecha</th>
-                  <th class="p-2">Contacto</th>
-                  <th class="p-2">Asunto</th>
-                  <th class="p-2">Acuerdos</th>
+                  <th class="p-2">Proveedor</th>
+                  <th class="p-2">Teléfono / Web</th>
+                  <th class="p-2">Física en Ags</th>
+                  <th class="p-2">Direcciones</th>
+                  <th class="p-2">Acción</th>
                 </tr>
               </thead>
-              <tbody id="tabla-visitas" class="divide-y divide-slate-800"></tbody>
+              <tbody id="tabla-proveedores" class="divide-y divide-slate-800"></tbody>
             </table>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SECCIÓN: INVENTARIO -->
+    <!-- CALENDARIO -->
+    <section id="tab-calendario" class="tab-content space-y-6 hidden">
+      <h2 class="text-3xl font-bold">Agenda y Calendario de Eventos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-xl space-y-4">
+          <h3 class="text-lg font-bold">Agendar Cita / Evento</h3>
+          <div>
+            <label class="text-xs text-slate-400">Fecha del Evento</label>
+            <input type="date" id="cal-fecha" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Hora</label>
+            <input type="time" id="cal-hora" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Cliente / Proveedor Asociado</label>
+            <select id="cal-contacto" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1"></select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Asunto / Título</label>
+            <input type="text" id="cal-asunto" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Detalles / Acuerdos</label>
+            <textarea id="cal-detalles" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1 h-20"></textarea>
+          </div>
+          <button onclick="guardarEvento()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Guardar Evento</button>
+        </div>
+
+        <div class="md:col-span-2 glass-card p-6 rounded-xl">
+          <h3 class="text-lg font-bold mb-4">Eventos Programados</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead class="text-xs uppercase bg-slate-800 text-slate-400">
+                <tr>
+                  <th class="p-2">Fecha y Hora</th>
+                  <th class="p-2">Contacto</th>
+                  <th class="p-2">Asunto</th>
+                  <th class="p-2">Detalles</th>
+                  <th class="p-2">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-calendario" class="divide-y divide-slate-800"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVENTARIO -->
     <section id="tab-inventario" class="tab-content space-y-6 hidden">
       <h2 class="text-3xl font-bold">Control de Inventario</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -230,8 +261,9 @@
             <label class="text-xs text-slate-400">Precio Unitario ($)</label>
             <input type="number" step="0.01" id="inv-precio" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
-          <button onclick="guardarInventario()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Agregar al Inventario</button>
+          <button onclick="guardarInventario()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Agregar Producto</button>
         </div>
+
         <div class="md:col-span-2 glass-card p-6 rounded-xl">
           <h3 class="text-lg font-bold mb-4">Existencias</h3>
           <div class="overflow-x-auto">
@@ -251,21 +283,21 @@
       </div>
     </section>
 
-    <!-- SECCIÓN: FINANZAS -->
+    <!-- VENTAS Y COMPRAS -->
     <section id="tab-finanzas" class="tab-content space-y-6 hidden">
-      <h2 class="text-3xl font-bold">Gestión Financiera</h2>
+      <h2 class="text-3xl font-bold">Ventas y Compras</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="glass-card p-6 rounded-xl space-y-4">
           <h3 class="text-lg font-bold">Registrar Movimiento</h3>
           <div>
             <label class="text-xs text-slate-400">Tipo de Movimiento</label>
             <select id="fin-tipo" onchange="toggleCamposIngreso()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
-              <option value="Ingreso">Ingreso (Venta)</option>
-              <option value="Gasto">Gasto / Egreso</option>
+              <option value="Venta">Venta (Ingreso)</option>
+              <option value="Compra">Compra a Proveedor (Gasto)</option>
             </select>
           </div>
           <div>
-            <label class="text-xs text-slate-400">Fecha de Venta / Movimiento</label>
+            <label class="text-xs text-slate-400">Fecha</label>
             <input type="date" id="fin-fecha" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
           <div>
@@ -303,7 +335,7 @@
         </div>
 
         <div class="md:col-span-2 glass-card p-6 rounded-xl">
-          <h3 class="text-lg font-bold mb-4">Historial de Transacciones</h3>
+          <h3 class="text-lg font-bold mb-4">Historial de Operaciones</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-300">
               <thead class="text-xs uppercase bg-slate-800 text-slate-400">
@@ -314,6 +346,7 @@
                   <th class="p-2">Vendedor</th>
                   <th class="p-2">Monto</th>
                   <th class="p-2">Utilidad</th>
+                  <th class="p-2">Acción</th>
                 </tr>
               </thead>
               <tbody id="tabla-finanzas" class="divide-y divide-slate-800"></tbody>
@@ -323,211 +356,283 @@
       </div>
     </section>
 
-    <!-- SECCIÓN: EXPORTAR EXCEL -->
-    <section id="tab-exportar" class="tab-content space-y-6 hidden">
-      <h2 class="text-3xl font-bold">Exportar Datos</h2>
+    <!-- RESPALDOS Y DATOS -->
+    <section id="tab-respaldos" class="tab-content space-y-6 hidden">
+      <h2 class="text-3xl font-bold">Gestión de Datos y Respaldos</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="glass-card p-6 rounded-xl space-y-3">
-          <h3 class="text-lg font-bold text-emerald-400">Ventas y Gastos</h3>
-          <p class="text-xs text-slate-400">Descarga el reporte de movimientos financieros en formato CSV para Excel.</p>
-          <button onclick="exportarFinanzasCSV()" class="accent-btn w-full py-2 rounded text-sm font-semibold">Descargar Excel (CSV)</button>
+        
+        <!-- DESCARGA / SUBIDA JSON -->
+        <div class="glass-card p-6 rounded-xl space-y-4">
+          <h3 class="text-lg font-bold text-amber-400">Copia de Seguridad (Sincronización Manual)</h3>
+          <p class="text-xs text-slate-400">Descarga un archivo con toda la base de datos de tu CRM para guardarlo o abrirlo en cualquier otra computadora.</p>
+
+          <button onclick="descargarBaseDatosJSON()" class="accent-btn w-full py-2.5 rounded text-sm font-semibold flex items-center justify-center space-x-2">
+            <span>⬇ Descargar Copia de Seguridad (.json)</span>
+          </button>
+
+          <div class="border-t border-slate-800 pt-4 space-y-2">
+            <label class="text-xs text-slate-400 block">Cargar/Restaurar Copia de Seguridad:</label>
+            <input type="file" id="input-subir-json" accept=".json" class="w-full text-xs text-slate-400 bg-slate-900 p-2 rounded border border-slate-700">
+            <button onclick="cargarBaseDatosJSON()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2 rounded text-sm font-semibold">
+              ⬆ Cargar / Restaurar Datos
+            </button>
+          </div>
         </div>
 
-        <div class="glass-card p-6 rounded-xl space-y-3">
-          <h3 class="text-lg font-bold text-sky-400">Contactos</h3>
-          <p class="text-xs text-slate-400">Descarga el directorio completo clasificado por clientes y proveedores.</p>
-          <button onclick="exportarContactosCSV()" class="accent-btn w-full py-2 rounded text-sm font-semibold">Descargar Excel (CSV)</button>
+        <!-- EXPORTAR A EXCEL CSV -->
+        <div class="glass-card p-6 rounded-xl space-y-4">
+          <h3 class="text-lg font-bold text-sky-400">Exportar Reportes a Excel</h3>
+          <p class="text-xs text-slate-400">Descarga reportes individuales de tus tablas para abrirlos en Microsoft Excel.</p>
+          <button onclick="exportarFinanzasCSV()" class="accent-btn w-full py-2 rounded text-sm font-semibold">Descargar Ventas y Compras (CSV)</button>
+          <button onclick="exportarClientesCSV()" class="accent-btn w-full py-2 rounded text-sm font-semibold">Descargar Lista de Clientes (CSV)</button>
+          <button onclick="exportarProveedoresCSV()" class="accent-btn w-full py-2 rounded text-sm font-semibold">Descargar Lista de Proveedores (CSV)</button>
         </div>
+
       </div>
     </section>
 
   </main>
 
-  <!-- MÓDULOS SDK DE FIREBASE (v10) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getAuth, 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword, 
-      signOut, 
-      onAuthStateChanged 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { 
-      getFirestore, 
-      collection, 
-      addDoc, 
-      deleteDoc, 
-      doc, 
-      onSnapshot 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // CONFIGURACIÓN DE FIREBASE (REEMPLAZAR CON TUS CLAVES)
-    const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_PROYECTO.firebaseapp.com",
-      projectId: "TU_PROYECTO_ID",
-      storageBucket: "TU_PROYECTO.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
+  <script>
+    let db = JSON.parse(localStorage.getItem('crm_db_v2')) || {
+      clientes: [],
+      proveedores: [],
+      calendario: [],
+      inventario: [],
+      finanzas: []
     };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let isLoginMode = true;
-    let localDb = { agenda: [], visitas: [], inventario: [], finanzas: [] };
     let chartInstance = null;
 
-    // --- ESCUCHAR ESTADO DE SESIÓN ---
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        document.getElementById('auth-modal').classList.add('hidden');
-        document.getElementById('user-info').innerText = user.email;
-        escucharColecciones();
-      } else {
-        document.getElementById('auth-modal').classList.remove('hidden');
-        document.getElementById('user-info').innerText = 'No autenticado';
-      }
+    function saveDb() {
+      localStorage.setItem('crm_db_v2', JSON.stringify(db));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const hoy = new Date().toISOString().split('T')[0];
+      document.getElementById('cal-fecha').value = hoy;
+      document.getElementById('fin-fecha').value = hoy;
+      renderAll();
     });
 
-    // --- AUTENTICACIÓN ---
-    window.toggleAuthMode = function() {
-      isLoginMode = !isLoginMode;
-      document.getElementById('auth-title').innerText = isLoginMode ? 'Iniciar Sesión' : 'Crear Cuenta';
-      document.getElementById('auth-btn-submit').innerText = isLoginMode ? 'Iniciar Sesión' : 'Registrarme';
-      document.getElementById('auth-toggle-text').innerText = isLoginMode ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
-      document.getElementById('auth-toggle-btn').innerText = isLoginMode ? 'Registrarse' : 'Iniciar Sesión';
-    };
-
-    window.ejecutarAuth = async function() {
-      const email = document.getElementById('auth-email').value.trim();
-      const password = document.getElementById('auth-password').value.trim();
-
-      if (!email || !password) return alert('Por favor ingresa correo y contraseña.');
-
-      try {
-        if (isLoginMode) {
-          await signInWithEmailAndPassword(auth, email, password);
-        } else {
-          await createUserWithEmailAndPassword(auth, email, password);
-          alert('Cuenta creada exitosamente.');
-        }
-      } catch (error) {
-        alert('Error: ' + error.message);
-      }
-    };
-
-    window.cerrarSesion = function() {
-      signOut(auth);
-    };
-
-    // --- NAVEGACIÓN DE PESTAÑAS ---
-    window.switchTab = function(tabId) {
+    function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
       document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('sidebar-item-active'));
       document.getElementById(`btn-${tabId}`).classList.add('sidebar-item-active');
       if(tabId === 'resumen') updateDashboard();
-    };
-
-    // --- LECTURA EN TIEMPO REAL DESDE FIRESTORE ---
-    function escucharColecciones() {
-      const hoy = new Date().toISOString().split('T')[0];
-      document.getElementById('visita-fecha').value = hoy;
-      document.getElementById('fin-fecha').value = hoy;
-
-      onSnapshot(collection(db, "agenda"), (snapshot) => {
-        localDb.agenda = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
-        renderAgenda();
-        updateDashboard();
-      });
-
-      onSnapshot(collection(db, "visitas"), (snapshot) => {
-        localDb.visitas = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
-        renderVisitas();
-      });
-
-      onSnapshot(collection(db, "inventario"), (snapshot) => {
-        localDb.inventario = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
-        renderInventario();
-      });
-
-      onSnapshot(collection(db, "finanzas"), (snapshot) => {
-        localDb.finanzas = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
-        renderFinanzas();
-        updateDashboard();
-      });
     }
 
-    // --- OPERACIONES FIRESTORE (GUARDAR / ELIMINAR) ---
-    window.guardarContacto = async function() {
-      const tipo = document.getElementById('agenda-tipo').value;
-      const nombre = document.getElementById('agenda-nombre').value.trim();
-      const telefono = document.getElementById('agenda-telefono').value.trim();
-      const correo = document.getElementById('agenda-correo').value.trim();
-      const notas = document.getElementById('agenda-notas').value.trim();
+    function renderAll() {
+      renderClientes();
+      renderProveedores();
+      renderCalendario();
+      renderInventario();
+      renderFinanzas();
+      updateDashboard();
+      actualizarSelectsContactos();
+    }
+
+    // --- CLIENTES ---
+    function guardarCliente() {
+      const nombre = document.getElementById('cliente-nombre').value.trim();
+      const telefono = document.getElementById('cliente-telefono').value.trim();
+      const correo = document.getElementById('cliente-correo').value.trim();
+      const notas = document.getElementById('cliente-notas').value.trim();
 
       if (!nombre) return alert('El nombre es obligatorio.');
 
-      await addDoc(collection(db, "agenda"), { tipo, nombre, telefono, correo, notas });
-      document.getElementById('agenda-nombre').value = '';
-      document.getElementById('agenda-telefono').value = '';
-      document.getElementById('agenda-correo').value = '';
-      document.getElementById('agenda-notas').value = '';
-    };
+      db.clientes.push({ id: Date.now(), nombre, telefono, correo, notas });
+      saveDb();
+      renderClientes();
+      actualizarSelectsContactos();
 
-    window.eliminarContacto = async function(docId) {
-      await deleteDoc(doc(db, "agenda", docId));
-    };
+      document.getElementById('cliente-nombre').value = '';
+      document.getElementById('cliente-telefono').value = '';
+      document.getElementById('cliente-correo').value = '';
+      document.getElementById('cliente-notas').value = '';
+    }
 
-    window.guardarVisita = async function() {
-      const fecha = document.getElementById('visita-fecha').value;
-      const contacto = document.getElementById('visita-contacto').value;
-      const asunto = document.getElementById('visita-asunto').value.trim();
-      const acuerdos = document.getElementById('visita-acuerdos').value.trim();
+    function eliminarCliente(id) {
+      db.clientes = db.clientes.filter(c => c.id !== id);
+      saveDb();
+      renderClientes();
+      actualizarSelectsContactos();
+    }
 
-      if (!asunto) return alert('Ingresa el asunto.');
+    function renderClientes() {
+      const tbody = document.getElementById('tabla-clientes');
+      tbody.innerHTML = '';
+      db.clientes.forEach(c => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 font-medium">${c.nombre}</td>
+            <td class="p-2">${c.telefono}</td>
+            <td class="p-2">${c.correo}</td>
+            <td class="p-2 text-xs text-slate-400">${c.notas}</td>
+            <td class="p-2"><button onclick="eliminarCliente(${c.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button></td>
+          </tr>
+        `;
+      });
+    }
 
-      await addDoc(collection(db, "visitas"), { fecha, contacto: contacto || 'Anónimo', asunto, acuerdos });
-      document.getElementById('visita-asunto').value = '';
-      document.getElementById('visita-acuerdos').value = '';
-    };
+    // --- PROVEEDORES ---
+    function guardarProveedor() {
+      const nombre = document.getElementById('prov-nombre').value.trim();
+      const telefono = document.getElementById('prov-telefono').value.trim();
+      const web = document.getElementById('prov-web').value.trim();
+      const ags = document.getElementById('prov-ags').value;
+      const dir1 = document.getElementById('prov-dir1').value.trim();
+      const dir2 = document.getElementById('prov-dir2').value.trim();
+      const dir3 = document.getElementById('prov-dir3').value.trim();
 
-    window.guardarInventario = async function() {
+      if (!nombre) return alert('El nombre del proveedor es obligatorio.');
+
+      db.proveedores.push({ id: Date.now(), nombre, telefono, web, ags, dir1, dir2, dir3 });
+      saveDb();
+      renderProveedores();
+      actualizarSelectsContactos();
+
+      document.getElementById('prov-nombre').value = '';
+      document.getElementById('prov-telefono').value = '';
+      document.getElementById('prov-web').value = '';
+      document.getElementById('prov-dir1').value = '';
+      document.getElementById('prov-dir2').value = '';
+      document.getElementById('prov-dir3').value = '';
+    }
+
+    function eliminarProveedor(id) {
+      db.proveedores = db.proveedores.filter(p => p.id !== id);
+      saveDb();
+      renderProveedores();
+      actualizarSelectsContactos();
+    }
+
+    function renderProveedores() {
+      const tbody = document.getElementById('tabla-proveedores');
+      tbody.innerHTML = '';
+      db.proveedores.forEach(p => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 font-medium">${p.nombre}</td>
+            <td class="p-2 text-xs">
+              <div>${p.telefono || '-'}</div>
+              ${p.web ? `<a href="${p.web}" target="_blank" class="text-sky-400 hover:underline">${p.web}</a>` : ''}
+            </td>
+            <td class="p-2 text-xs font-semibold ${p.ags === 'Sí' ? 'text-emerald-400' : 'text-slate-400'}">${p.ags}</td>
+            <td class="p-2 text-xs text-slate-400">
+              ${p.dir1 ? `<div>1: ${p.dir1}</div>` : ''}
+              ${p.dir2 ? `<div>2: ${p.dir2}</div>` : ''}
+              ${p.dir3 ? `<div>3: ${p.dir3}</div>` : ''}
+            </td>
+            <td class="p-2"><button onclick="eliminarProveedor(${p.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    // --- CALENDARIO ---
+    function guardarEvento() {
+      const fecha = document.getElementById('cal-fecha').value;
+      const hora = document.getElementById('cal-hora').value;
+      const contacto = document.getElementById('cal-contacto').value;
+      const asunto = document.getElementById('cal-asunto').value.trim();
+      const detalles = document.getElementById('cal-detalles').value.trim();
+
+      if (!asunto || !fecha) return alert('Ingresa fecha y asunto.');
+
+      db.calendario.push({ id: Date.now(), fecha, hora: hora || 'Todo el día', contacto: contacto || 'General', asunto, detalles });
+      saveDb();
+      renderCalendario();
+
+      document.getElementById('cal-asunto').value = '';
+      document.getElementById('cal-detalles').value = '';
+    }
+
+    function eliminarEvento(id) {
+      db.calendario = db.calendario.filter(e => e.id !== id);
+      saveDb();
+      renderCalendario();
+    }
+
+    function renderCalendario() {
+      const tbody = document.getElementById('tabla-calendario');
+      tbody.innerHTML = '';
+      db.calendario.forEach(ev => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 text-xs text-slate-400">${ev.fecha} (${ev.hora})</td>
+            <td class="p-2 font-medium">${ev.contacto}</td>
+            <td class="p-2 font-semibold text-slate-200">${ev.asunto}</td>
+            <td class="p-2 text-xs text-slate-400">${ev.detalles}</td>
+            <td class="p-2"><button onclick="eliminarEvento(${ev.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function actualizarSelectsContactos() {
+      const selectCal = document.getElementById('cal-contacto');
+      selectCal.innerHTML = '<option value="">-- Ninguno / General --</option>';
+
+      db.clientes.forEach(c => selectCal.innerHTML += `<option value="Cliente: ${c.nombre}">Cliente: ${c.nombre}</option>`);
+      db.proveedores.forEach(p => selectCal.innerHTML += `<option value="Proveedor: ${p.nombre}">Proveedor: ${p.nombre}</option>`);
+    }
+
+    // --- INVENTARIO ---
+    function guardarInventario() {
       const nombre = document.getElementById('inv-nombre').value.trim();
       const stock = parseInt(document.getElementById('inv-stock').value);
       const precio = parseFloat(document.getElementById('inv-precio').value);
 
       if (!nombre || isNaN(stock) || isNaN(precio)) return alert('Completa los datos.');
 
-      await addDoc(collection(db, "inventario"), { nombre, stock, precio });
+      db.inventario.push({ id: Date.now(), nombre, stock, precio });
+      saveDb();
+      renderInventario();
+
       document.getElementById('inv-nombre').value = '';
       document.getElementById('inv-stock').value = '';
       document.getElementById('inv-precio').value = '';
-    };
+    }
 
-    window.eliminarInventario = async function(docId) {
-      await deleteDoc(doc(db, "inventario", docId));
-    };
+    function eliminarInventario(id) {
+      db.inventario = db.inventario.filter(i => i.id !== id);
+      saveDb();
+      renderInventario();
+    }
 
-    window.toggleCamposIngreso = function() {
+    function renderInventario() {
+      const tbody = document.getElementById('tabla-inventario');
+      tbody.innerHTML = '';
+      db.inventario.forEach(i => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 font-medium">${i.nombre}</td>
+            <td class="p-2">${i.stock} pza(s)</td>
+            <td class="p-2 font-bold text-emerald-400">$${i.precio.toFixed(2)}</td>
+            <td class="p-2"><button onclick="eliminarInventario(${i.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    // --- FINANZAS (VENTAS Y COMPRAS) ---
+    function toggleCamposIngreso() {
       const tipo = document.getElementById('fin-tipo').value;
       const wrapper = document.getElementById('wrapper-vendedor');
-      if (tipo === 'Gasto') wrapper.classList.add('hidden');
+      if (tipo === 'Compra') wrapper.classList.add('hidden');
       else wrapper.classList.remove('hidden');
-    };
+    }
 
-    window.calcularUtilidad = function() {
+    function calcularUtilidad() {
       const monto = parseFloat(document.getElementById('fin-monto').value) || 0;
       const pct = parseFloat(document.getElementById('fin-utilidad-pct').value) || 0;
       const utilidadMonto = monto * (pct / 100);
       document.getElementById('lbl-utilidad-monto').innerText = `$${utilidadMonto.toFixed(2)}`;
       return utilidadMonto;
-    };
+    }
 
-    window.guardarFinanza = async function() {
+    function guardarFinanza() {
       const tipo = document.getElementById('fin-tipo').value;
       const fecha = document.getElementById('fin-fecha').value;
       const concepto = document.getElementById('fin-concepto').value.trim();
@@ -535,111 +640,69 @@
       const vendedor = document.getElementById('fin-vendedor').value.trim();
       const pct = parseFloat(document.getElementById('fin-utilidad-pct').value);
 
-      if(!concepto || isNaN(monto) || !fecha) return alert('Completa los campos de finanzas.');
+      if(!concepto || isNaN(monto) || !fecha) return alert('Completa los campos.');
 
-      let utilidadCalculada = tipo === 'Ingreso' ? monto * (pct / 100) : 0;
+      let utilidadCalculada = tipo === 'Venta' ? monto * (pct / 100) : 0;
 
-      await addDoc(collection(db, "finanzas"), {
+      db.finanzas.push({
+        id: Date.now(),
         fecha,
         tipo,
         concepto,
         monto,
-        vendedor: tipo === 'Ingreso' ? (vendedor || 'N/A') : '-',
-        utilidadPct: tipo === 'Ingreso' ? pct : 0,
+        vendedor: tipo === 'Venta' ? (vendedor || 'N/A') : '-',
+        utilidadPct: tipo === 'Venta' ? pct : 0,
         utilidadMonto: utilidadCalculada
       });
+
+      saveDb();
+      renderFinanzas();
+      updateDashboard();
 
       document.getElementById('fin-concepto').value = '';
       document.getElementById('fin-monto').value = '';
       document.getElementById('fin-vendedor').value = '';
       calcularUtilidad();
-    };
-
-    // --- RENDERS DE TABLAS ---
-    function renderAgenda() {
-      const tbody = document.getElementById('tabla-agenda');
-      const selectVisita = document.getElementById('visita-contacto');
-      tbody.innerHTML = '';
-      selectVisita.innerHTML = '<option value="">-- Seleccionar --</option>';
-
-      localDb.agenda.forEach(c => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-800/50">
-            <td class="p-2 text-xs font-semibold ${c.tipo === 'Cliente' ? 'text-sky-400' : 'text-purple-400'}">${c.tipo}</td>
-            <td class="p-2 font-medium">${c.nombre}</td>
-            <td class="p-2">${c.telefono}</td>
-            <td class="p-2">${c.correo}</td>
-            <td class="p-2">
-              <button onclick="eliminarContacto('${c.docId}')" class="text-rose-400 hover:underline text-xs">Eliminar</button>
-            </td>
-          </tr>
-        `;
-        selectVisita.innerHTML += `<option value="${c.nombre}">${c.nombre} (${c.tipo})</option>`;
-      });
     }
 
-    function renderVisitas() {
-      const tbody = document.getElementById('tabla-visitas');
-      tbody.innerHTML = '';
-      localDb.visitas.forEach(v => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-800/50">
-            <td class="p-2 text-xs text-slate-400">${v.fecha}</td>
-            <td class="p-2 font-medium">${v.contacto}</td>
-            <td class="p-2">${v.asunto}</td>
-            <td class="p-2 text-xs text-slate-400">${v.acuerdos}</td>
-          </tr>
-        `;
-      });
-    }
-
-    function renderInventario() {
-      const tbody = document.getElementById('tabla-inventario');
-      tbody.innerHTML = '';
-      localDb.inventario.forEach(i => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-800/50">
-            <td class="p-2 font-medium">${i.nombre}</td>
-            <td class="p-2">${i.stock} pza(s)</td>
-            <td class="p-2 font-bold text-emerald-400">$${i.precio.toFixed(2)}</td>
-            <td class="p-2">
-              <button onclick="eliminarInventario('${i.docId}')" class="text-rose-400 hover:underline text-xs">Eliminar</button>
-            </td>
-          </tr>
-        `;
-      });
+    function eliminarFinanza(id) {
+      db.finanzas = db.finanzas.filter(f => f.id !== id);
+      saveDb();
+      renderFinanzas();
+      updateDashboard();
     }
 
     function renderFinanzas() {
       const tbody = document.getElementById('tabla-finanzas');
       tbody.innerHTML = '';
-      localDb.finanzas.forEach(f => {
-        const esIngreso = f.tipo === 'Ingreso';
+      db.finanzas.forEach(f => {
+        const esVenta = f.tipo === 'Venta';
         tbody.innerHTML += `
           <tr class="hover:bg-slate-800/50">
             <td class="p-2 text-slate-400 text-xs">${f.fecha}</td>
-            <td class="p-2 font-semibold ${esIngreso ? 'text-emerald-400' : 'text-rose-400'}">${f.tipo}</td>
+            <td class="p-2 font-semibold ${esVenta ? 'text-emerald-400' : 'text-rose-400'}">${f.tipo}</td>
             <td class="p-2">${f.concepto}</td>
             <td class="p-2 text-slate-300">${f.vendedor || '-'}</td>
             <td class="p-2 font-bold">$${f.monto.toFixed(2)}</td>
-            <td class="p-2 text-xs ${esIngreso ? 'text-amber-400' : 'text-slate-500'}">
-              ${esIngreso ? `${f.utilidadPct}% ($${f.utilidadMonto.toFixed(2)})` : '-'}
+            <td class="p-2 text-xs ${esVenta ? 'text-amber-400' : 'text-slate-500'}">
+              ${esVenta ? `${f.utilidadPct}% ($${f.utilidadMonto.toFixed(2)})` : '-'}
             </td>
+            <td class="p-2"><button onclick="eliminarFinanza(${f.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button></td>
           </tr>
         `;
       });
     }
 
-    // --- DASHBOARD Y EXPORTACIONES ---
+    // --- DASHBOARD ---
     function updateDashboard() {
-      const ingresos = localDb.finanzas.filter(f => f.tipo === 'Ingreso').reduce((a, b) => a + b.monto, 0);
-      const gastos = localDb.finanzas.filter(f => f.tipo === 'Gasto').reduce((a, b) => a + b.monto, 0);
-      const utilidadTotal = localDb.finanzas.filter(f => f.tipo === 'Ingreso').reduce((a, b) => a + (b.utilidadMonto || 0), 0);
+      const ingresos = db.finanzas.filter(f => f.tipo === 'Venta').reduce((a, b) => a + b.monto, 0);
+      const gastos = db.finanzas.filter(f => f.tipo === 'Compra').reduce((a, b) => a + b.monto, 0);
+      const utilidadTotal = db.finanzas.filter(f => f.tipo === 'Venta').reduce((a, b) => a + (b.utilidadMonto || 0), 0);
 
       document.getElementById('dash-ingresos').innerText = `$${ingresos.toFixed(2)}`;
       document.getElementById('dash-gastos').innerText = `$${gastos.toFixed(2)}`;
       document.getElementById('dash-utilidad').innerText = `$${utilidadTotal.toFixed(2)}`;
-      document.getElementById('dash-contactos').innerText = localDb.agenda.length;
+      document.getElementById('dash-contactos').innerText = db.clientes.length;
 
       const ctx = document.getElementById('chartFinanzas').getContext('2d');
       if (chartInstance) chartInstance.destroy();
@@ -647,7 +710,7 @@
       chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Ingresos', 'Gastos', 'Utilidad'],
+          labels: ['Ventas', 'Compras/Gastos', 'Utilidad'],
           datasets: [{
             data: [ingresos, gastos, utilidadTotal],
             backgroundColor: ['#34d399', '#f87171', '#fbbf24']
@@ -657,23 +720,67 @@
       });
     }
 
-    window.exportarFinanzasCSV = function() {
-      if(localDb.finanzas.length === 0) return alert('Sin datos.');
+    // --- RESPALDOS JSON Y CSV ---
+    function descargarBaseDatosJSON() {
+      const jsonStr = JSON.stringify(db, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `CRM_Respaldo_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+    }
+
+    function cargarBaseDatosJSON() {
+      const fileInput = document.getElementById('input-subir-json');
+      if (!fileInput.files.length) return alert('Por favor selecciona un archivo .json');
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed.clientes && parsed.proveedores && parsed.finanzas) {
+            db = parsed;
+            saveDb();
+            renderAll();
+            alert('¡Base de datos cargada y restaurada con éxito!');
+          } else {
+            alert('El archivo cargado no tiene la estructura correcta del CRM.');
+          }
+        } catch (err) {
+          alert('Error al leer el archivo JSON.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function exportarFinanzasCSV() {
+      if(db.finanzas.length === 0) return alert('Sin datos.');
       let csv = 'Fecha,Tipo,Concepto,Vendedor,Monto,Utilidad_Pct,Utilidad_Monto\n';
-      localDb.finanzas.forEach(f => {
+      db.finanzas.forEach(f => {
         csv += `"${f.fecha}","${f.tipo}","${f.concepto}","${f.vendedor || '-'}","${f.monto}","${f.utilidadPct || 0}%","${f.utilidadMonto || 0}"\n`;
       });
-      descargarCSV(csv, `finanzas.csv`);
-    };
+      descargarCSV(csv, `ventas_y_compras.csv`);
+    }
 
-    window.exportarContactosCSV = function() {
-      if(localDb.agenda.length === 0) return alert('Sin datos.');
-      let csv = 'Tipo,Nombre,Telefono,Correo,Notas\n';
-      localDb.agenda.forEach(c => {
-        csv += `"${c.tipo}","${c.nombre}","${c.telefono}","${c.correo}","${c.notas}"\n`;
+    function exportarClientesCSV() {
+      if(db.clientes.length === 0) return alert('Sin datos.');
+      let csv = 'Nombre,Telefono,Correo,Notas\n';
+      db.clientes.forEach(c => {
+        csv += `"${c.nombre}","${c.telefono}","${c.correo}","${c.notas}"\n`;
       });
-      descargarCSV(csv, `contactos.csv`);
-    };
+      descargarCSV(csv, `clientes.csv`);
+    }
+
+    function exportarProveedoresCSV() {
+      if(db.proveedores.length === 0) return alert('Sin datos.');
+      let csv = 'Nombre,Telefono,Web,Fisica_Ags,Dir1,Dir2,Dir3\n';
+      db.proveedores.forEach(p => {
+        csv += `"${p.nombre}","${p.telefono}","${p.web}","${p.ags}","${p.dir1}","${p.dir2}","${p.dir3}"\n`;
+      });
+      descargarCSV(csv, `proveedores.csv`);
+    }
 
     function descargarCSV(contenido, nombreArchivo) {
       const blob = new Blob(["\uFEFF" + contenido], { type: 'text/csv;charset=utf-8;' });
