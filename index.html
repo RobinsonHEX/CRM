@@ -14,6 +14,7 @@
     .accent-btn { background-color: #3b4e53; color: #ffffff; transition: all 0.2s; }
     .accent-btn:hover { background-color: #4a6268; }
     .sidebar-item-active { background-color: #2a383b; border-left: 4px solid #81a19f; color: #ffffff; }
+    .subtab-active { background-color: #3b4e53; color: #ffffff; border-bottom: 2px solid #34d399; }
   </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -345,24 +346,71 @@
           <button onclick="guardarFinanza()" class="w-full accent-btn py-2 rounded text-sm font-semibold">Guardar Registro</button>
         </div>
 
-        <div class="md:col-span-2 glass-card p-6 rounded-xl">
-          <h3 class="text-lg font-bold mb-4">Historial de Operaciones</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-300">
-              <thead class="text-xs uppercase bg-slate-800 text-slate-400">
-                <tr>
-                  <th class="p-2">Fecha</th>
-                  <th class="p-2">Tipo</th>
-                  <th class="p-2">Producto / Cant.</th>
-                  <th class="p-2">Vendedor</th>
-                  <th class="p-2">Monto</th>
-                  <th class="p-2">Utilidad</th>
-                  <th class="p-2">Acción</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-finanzas" class="divide-y divide-slate-800"></tbody>
-            </table>
+        <div class="md:col-span-2 glass-card p-6 rounded-xl space-y-4">
+          <!-- Pestañas de Navegación entre Ventas y Compras -->
+          <div class="flex border-b border-slate-700 space-x-2">
+            <button id="btn-subtab-ventas" onclick="switchSubtabFinanzas('ventas')" class="py-2 px-4 text-sm font-semibold rounded-t-lg subtab-active">
+              🛒 Ventas (Ingresos)
+            </button>
+            <button id="btn-subtab-compras" onclick="switchSubtabFinanzas('compras')" class="py-2 px-4 text-sm font-semibold text-slate-400 hover:text-slate-200 transition rounded-t-lg">
+              📦 Compras (Gastos)
+            </button>
           </div>
+
+          <!-- APARTADO DE VENTAS -->
+          <div id="subtab-ventas" class="space-y-4">
+            <div class="flex justify-between items-center bg-emerald-950/40 p-3 rounded-lg border border-emerald-800/40">
+              <div>
+                <span class="text-xs text-slate-400 block uppercase">Total Ventas</span>
+                <span id="total-ventas-monto" class="text-xl font-bold text-emerald-400">$0.00</span>
+              </div>
+              <div class="text-right">
+                <span class="text-xs text-slate-400 block uppercase">Ganancia Total (Utilidad)</span>
+                <span id="total-ventas-ganancia" class="text-xl font-bold text-amber-400">$0.00</span>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm text-slate-300">
+                <thead class="text-xs uppercase bg-slate-800 text-slate-400">
+                  <tr>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Producto / Cant.</th>
+                    <th class="p-2">Vendedor</th>
+                    <th class="p-2">Venta Total</th>
+                    <th class="p-2">Ganancia</th>
+                    <th class="p-2">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-ventas" class="divide-y divide-slate-800"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- APARTADO DE COMPRAS -->
+          <div id="subtab-compras" class="space-y-4 hidden">
+            <div class="flex justify-between items-center bg-rose-950/40 p-3 rounded-lg border border-rose-800/40">
+              <div>
+                <span class="text-xs text-slate-400 block uppercase">Total Compras / Gastos</span>
+                <span id="total-compras-monto" class="text-xl font-bold text-rose-400">$0.00</span>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm text-slate-300">
+                <thead class="text-xs uppercase bg-slate-800 text-slate-400">
+                  <tr>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Producto / Cant.</th>
+                    <th class="p-2">Monto Total</th>
+                    <th class="p-2">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-compras" class="divide-y divide-slate-800"></tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -429,6 +477,29 @@
       document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('sidebar-item-active'));
       document.getElementById(`btn-${tabId}`).classList.add('sidebar-item-active');
       if(tabId === 'resumen') updateDashboard();
+    }
+
+    function switchSubtabFinanzas(tipo) {
+      const btnVentas = document.getElementById('btn-subtab-ventas');
+      const btnCompras = document.getElementById('btn-subtab-compras');
+      const subtabVentas = document.getElementById('subtab-ventas');
+      const subtabCompras = document.getElementById('subtab-compras');
+
+      if (tipo === 'ventas') {
+        subtabVentas.classList.remove('hidden');
+        subtabCompras.classList.add('hidden');
+        btnVentas.classList.add('subtab-active');
+        btnVentas.classList.remove('text-slate-400');
+        btnCompras.classList.remove('subtab-active');
+        btnCompras.classList.add('text-slate-400');
+      } else {
+        subtabCompras.classList.remove('hidden');
+        subtabVentas.classList.add('hidden');
+        btnCompras.classList.add('subtab-active');
+        btnCompras.classList.remove('text-slate-400');
+        btnVentas.classList.remove('subtab-active');
+        btnVentas.classList.add('text-slate-400');
+      }
     }
 
     function renderAll() {
@@ -624,6 +695,24 @@
       }
     }
 
+    function modificarPrecio(id) {
+      const item = db.inventario.find(i => i.id === id);
+      if (item) {
+        const nuevoPrecioStr = prompt(`Ingrese el nuevo precio para "${item.nombre}":`, item.precio);
+        if (nuevoPrecioStr !== null) {
+          const nuevoPrecio = parseFloat(nuevoPrecioStr);
+          if (!isNaN(nuevoPrecio) && nuevoPrecio >= 0) {
+            item.precio = nuevoPrecio;
+            saveDb();
+            renderInventario();
+            actualizarSelectProductos();
+          } else {
+            alert('Por favor ingrese un precio válido.');
+          }
+        }
+      }
+    }
+
     function eliminarInventario(id) {
       db.inventario = db.inventario.filter(i => i.id !== id);
       saveDb();
@@ -639,10 +728,15 @@
           <tr class="hover:bg-slate-800/50">
             <td class="p-2 font-medium">${i.nombre}</td>
             <td class="p-2">${i.stock} pza(s)</td>
-            <td class="p-2 font-bold text-emerald-400">$${i.precio.toFixed(2)}</td>
-            <td class="p-2 space-x-1">
-              <button onclick="modificarStock(${i.id}, 1)" class="bg-slate-700 hover:bg-slate-600 text-xs px-2 py-1 rounded font-bold text-emerald-400">+</button>
-              <button onclick="modificarStock(${i.id}, -1)" class="bg-slate-700 hover:bg-slate-600 text-xs px-2 py-1 rounded font-bold text-rose-400">-</button>
+            <td class="p-2 font-bold text-emerald-400">
+              $${i.precio.toFixed(2)}
+              <button onclick="modificarPrecio(${i.id})" title="Editar precio" class="ml-2 text-xs text-sky-400 hover:underline font-normal">✏️</button>
+            </td>
+            <td class="p-2">
+              <div class="inline-flex space-x-1">
+                <button onclick="modificarStock(${i.id}, 1)" class="bg-slate-700 hover:bg-slate-600 text-xs px-2 py-1 rounded font-bold text-emerald-400">+</button>
+                <button onclick="modificarStock(${i.id}, -1)" class="bg-slate-700 hover:bg-slate-600 text-xs px-2 py-1 rounded font-bold text-rose-400">-</button>
+              </div>
             </td>
             <td class="p-2"><button onclick="eliminarInventario(${i.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button></td>
           </tr>
@@ -768,24 +862,50 @@
     }
 
     function renderFinanzas() {
-      const tbody = document.getElementById('tabla-finanzas');
-      tbody.innerHTML = '';
+      const tbodyVentas = document.getElementById('tabla-ventas');
+      const tbodyCompras = document.getElementById('tabla-compras');
+
+      tbodyVentas.innerHTML = '';
+      tbodyCompras.innerHTML = '';
+
+      let totalVentas = 0;
+      let totalGananciaVentas = 0;
+      let totalCompras = 0;
+
       db.finanzas.forEach(f => {
-        const esVenta = f.tipo === 'Venta';
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-800/50">
-            <td class="p-2 text-slate-400 text-xs">${f.fecha}</td>
-            <td class="p-2 font-semibold ${esVenta ? 'text-emerald-400' : 'text-rose-400'}">${f.tipo}</td>
-            <td class="p-2">${f.concepto}</td>
-            <td class="p-2 text-slate-300">${f.vendedor || '-'}</td>
-            <td class="p-2 font-bold">$${f.monto.toFixed(2)}</td>
-            <td class="p-2 text-xs ${esVenta ? 'text-amber-400' : 'text-slate-500'}">
-              ${esVenta ? `${f.utilidadPct}% ($${f.utilidadMonto.toFixed(2)})` : '-'}
-            </td>
-            <td class="p-2"><button onclick="eliminarFinanza(${f.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button></td>
-          </tr>
-        `;
+        if (f.tipo === 'Venta') {
+          totalVentas += f.monto;
+          totalGananciaVentas += (f.utilidadMonto || 0);
+
+          tbodyVentas.innerHTML += `
+            <tr class="hover:bg-slate-800/50">
+              <td class="p-2 text-slate-400 text-xs">${f.fecha}</td>
+              <td class="p-2 font-medium">${f.concepto}</td>
+              <td class="p-2 text-slate-300">${f.vendedor || '-'}</td>
+              <td class="p-2 font-bold text-emerald-400">$${f.monto.toFixed(2)}</td>
+              <td class="p-2 text-xs text-amber-400 font-bold">
+                $${(f.utilidadMonto || 0).toFixed(2)} <span class="text-slate-500 font-normal">(${f.utilidadPct || 0}%)</span>
+              </td>
+              <td class="p-2"><button onclick="eliminarFinanza(${f.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button></td>
+            </tr>
+          `;
+        } else {
+          totalCompras += f.monto;
+
+          tbodyCompras.innerHTML += `
+            <tr class="hover:bg-slate-800/50">
+              <td class="p-2 text-slate-400 text-xs">${f.fecha}</td>
+              <td class="p-2 font-medium">${f.concepto}</td>
+              <td class="p-2 font-bold text-rose-400">$${f.monto.toFixed(2)}</td>
+              <td class="p-2"><button onclick="eliminarFinanza(${f.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button></td>
+            </tr>
+          `;
+        }
       });
+
+      document.getElementById('total-ventas-monto').innerText = `$${totalVentas.toFixed(2)}`;
+      document.getElementById('total-ventas-ganancia').innerText = `$${totalGananciaVentas.toFixed(2)}`;
+      document.getElementById('total-compras-monto').innerText = `$${totalCompras.toFixed(2)}`;
     }
 
     // --- DASHBOARD ---
