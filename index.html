@@ -23,7 +23,7 @@
   <aside class="w-64 glass-card flex flex-col justify-between p-4 z-10">
     <div>
       <div class="mb-8 p-2">
-        <h1 class="text-2xl font-bold tracking-wider text-slate-100">Bitácora</h1>
+        <h1 id="app-title" contenteditable="true" onblur="guardarTitulo()" class="text-2xl font-bold tracking-wider text-slate-100 outline-none border-b border-transparent hover:border-slate-500 focus:border-emerald-400 cursor-pointer" title="Haz clic para editar el título">Bitácora</h1>
         <p class="text-xs text-slate-400">Panel de operaciones comerciales</p>
       </div>
 
@@ -72,7 +72,7 @@
           <p id="dash-ingresos" class="text-2xl font-bold text-emerald-400 mt-1">$0.00</p>
         </div>
         <div class="glass-card p-4 rounded-xl">
-          <p class="text-xs uppercase text-slate-400 font-semibold">Total Compras / Gastos</p>
+          <p class="text-xs uppercase text-slate-400 font-semibold font-semibold">Total Compras / Gastos</p>
           <p id="dash-gastos" class="text-2xl font-bold text-rose-400 mt-1">$0.00</p>
         </div>
         <div class="glass-card p-4 rounded-xl">
@@ -329,12 +329,12 @@
             <div>
               <label class="text-xs text-slate-400">Porcentaje de Utilidad</label>
               <select id="fin-utilidad-pct" onchange="calcularUtilidad()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
+                <option value="0">0%</option>
+                <option value="5">5%</option>
                 <option value="10">10%</option>
-                <option value="11">11%</option>
-                <option value="12">12%</option>
-                <option value="13">13%</option>
-                <option value="14">14%</option>
                 <option value="15" selected>15%</option>
+                <option value="16">16%</option>
+                <option value="20">20%</option>
               </select>
             </div>
             <div class="p-2 bg-slate-900/60 rounded border border-slate-800 text-xs flex justify-between">
@@ -389,10 +389,18 @@
 
           <!-- APARTADO DE COMPRAS -->
           <div id="subtab-compras" class="space-y-4 hidden">
-            <div class="flex justify-between items-center bg-rose-950/40 p-3 rounded-lg border border-rose-800/40">
+            <div class="grid grid-cols-3 gap-3 bg-rose-950/40 p-3 rounded-lg border border-rose-800/40 text-center">
               <div>
-                <span class="text-xs text-slate-400 block uppercase">Total Compras / Gastos</span>
-                <span id="total-compras-monto" class="text-xl font-bold text-rose-400">$0.00</span>
+                <span class="text-xs text-slate-400 block uppercase">Total Gastos Brutos</span>
+                <span id="total-compras-monto" class="text-lg font-bold text-rose-400">$0.00</span>
+              </div>
+              <div>
+                <span class="text-xs text-slate-400 block uppercase">(- Utilidades Restadas)</span>
+                <span id="total-compras-utilidad" class="text-lg font-bold text-amber-400">$0.00</span>
+              </div>
+              <div>
+                <span class="text-xs text-slate-400 block uppercase font-semibold">Total Real Neto</span>
+                <span id="total-compras-neto" class="text-lg font-bold text-emerald-400">$0.00</span>
               </div>
             </div>
 
@@ -452,6 +460,7 @@
 
   <script>
     let db = JSON.parse(localStorage.getItem('crm_db_v2')) || {
+      titulo: 'Bitácora',
       clientes: [],
       proveedores: [],
       calendario: [],
@@ -464,7 +473,20 @@
       localStorage.setItem('crm_db_v2', JSON.stringify(db));
     }
 
+    function guardarTitulo() {
+      const el = document.getElementById('app-title');
+      const nuevoTitulo = el.innerText.trim() || 'Bitácora';
+      el.innerText = nuevoTitulo;
+      db.titulo = nuevoTitulo;
+      document.title = `${nuevoTitulo} — Operaciones Comerciales`;
+      saveDb();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      if (db.titulo) {
+        document.getElementById('app-title').innerText = db.titulo;
+        document.title = `${db.titulo} — Operaciones Comerciales`;
+      }
       const hoy = new Date().toISOString().split('T')[0];
       document.getElementById('cal-fecha').value = hoy;
       document.getElementById('fin-fecha').value = hoy;
@@ -903,9 +925,14 @@
         }
       });
 
+      const totalComprasNeto = totalCompras - totalGananciaVentas;
+
       document.getElementById('total-ventas-monto').innerText = `$${totalVentas.toFixed(2)}`;
       document.getElementById('total-ventas-ganancia').innerText = `$${totalGananciaVentas.toFixed(2)}`;
+      
       document.getElementById('total-compras-monto').innerText = `$${totalCompras.toFixed(2)}`;
+      document.getElementById('total-compras-utilidad').innerText = `$${totalGananciaVentas.toFixed(2)}`;
+      document.getElementById('total-compras-neto').innerText = `$${totalComprasNeto.toFixed(2)}`;
     }
 
     // --- DASHBOARD ---
@@ -957,6 +984,7 @@
           const parsed = JSON.parse(e.target.result);
           if (parsed.clientes && parsed.proveedores && parsed.finanzas) {
             db = parsed;
+            if (db.titulo) document.getElementById('app-title').innerText = db.titulo;
             saveDb();
             renderAll();
             alert('¡Base de datos cargada y restaurada con éxito!');
