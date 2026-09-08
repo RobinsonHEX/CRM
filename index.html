@@ -11,13 +11,40 @@
     body { font-family: 'Space Grotesk', sans-serif; background-color: #0f1416; color: #e1e7e5; }
     h1, h2, .brand-font { font-family: 'Cinzel', serif; }
     .glass-card { background: rgba(22, 30, 33, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); }
-    .accent-bg { background-color: #2a383b; }
     .accent-btn { background-color: #3b4e53; color: #ffffff; transition: all 0.2s; }
     .accent-btn:hover { background-color: #4a6268; }
     .sidebar-item-active { background-color: #2a383b; border-left: 4px solid #81a19f; color: #ffffff; }
   </style>
 </head>
 <body class="flex h-screen overflow-hidden">
+
+  <!-- MODAL DE LOGIN / AUTENTICACIÓN -->
+  <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass-card p-8 rounded-2xl w-full max-w-md space-y-6">
+      <div class="text-center">
+        <h2 id="auth-title" class="text-2xl font-bold text-white">Iniciar Sesión</h2>
+        <p class="text-xs text-slate-400 mt-1">Ingresa tus credenciales para acceder al CRM</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs text-slate-400">Correo Electrónico</label>
+          <input type="email" id="auth-email" placeholder="usuario@empresa.com" class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-sm mt-1 focus:outline-none focus:border-slate-500">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">Contraseña</label>
+          <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded p-2.5 text-sm mt-1 focus:outline-none focus:border-slate-500">
+        </div>
+
+        <button onclick="ejecutarAuth()" id="auth-btn-submit" class="w-full accent-btn py-3 rounded-lg text-sm font-semibold">Iniciar Sesión</button>
+      </div>
+
+      <div class="text-center text-xs text-slate-400">
+        <span id="auth-toggle-text">¿No tienes cuenta?</span>
+        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-sky-400 hover:underline font-semibold ml-1">Registrarse</button>
+      </div>
+    </div>
+  </div>
 
   <!-- BARRA LATERAL -->
   <aside class="w-64 glass-card flex flex-col justify-between p-4 z-10">
@@ -28,7 +55,7 @@
       </div>
 
       <nav class="space-y-2">
-        <button onclick="switchTab('resumen')" id="btn-resumen" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition">
+        <button onclick="switchTab('resumen')" id="btn-resumen" class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-slate-300 hover:bg-slate-800 transition sidebar-item-active">
           <span class="font-bold text-xs uppercase tracking-widest text-slate-400">R</span>
           <span>Resumen</span>
         </button>
@@ -55,8 +82,9 @@
       </nav>
     </div>
 
-    <div class="p-2 border-t border-slate-700/50 text-xs text-slate-500">
-      Datos guardados en tu almacenamiento local.
+    <div class="p-2 border-t border-slate-700/50 space-y-2">
+      <div id="user-info" class="text-xs text-slate-400 truncate">No autenticado</div>
+      <button onclick="cerrarSesion()" class="w-full text-left text-xs text-rose-400 hover:underline">Cerrar Sesión</button>
     </div>
   </aside>
 
@@ -223,7 +251,7 @@
       </div>
     </section>
 
-    <!-- SECCIÓN: FINANZAS (ACTUALIZADO) -->
+    <!-- SECCIÓN: FINANZAS -->
     <section id="tab-finanzas" class="tab-content space-y-6 hidden">
       <h2 class="text-3xl font-bold">Gestión Financiera</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -249,7 +277,6 @@
             <input type="number" step="0.01" id="fin-monto" oninput="calcularUtilidad()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm mt-1">
           </div>
           
-          <!-- CAMPOS EXCLUSIVOS DE VENTA / INGRESO -->
           <div id="wrapper-vendedor" class="space-y-4">
             <div>
               <label class="text-xs text-slate-400">Vendedor</label>
@@ -302,7 +329,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glass-card p-6 rounded-xl space-y-3">
           <h3 class="text-lg font-bold text-emerald-400">Ventas y Gastos</h3>
-          <p class="text-xs text-slate-400">Descarga el reporte de movimientos financieros con fecha, vendedor y utilidades registradas.</p>
+          <p class="text-xs text-slate-400">Descarga el reporte de movimientos financieros en formato CSV para Excel.</p>
           <button onclick="exportarFinanzasCSV()" class="accent-btn w-full py-2 rounded text-sm font-semibold">Descargar Excel (CSV)</button>
         </div>
 
@@ -316,61 +343,191 @@
 
   </main>
 
-  <script>
-    // ESTADO DE LA APLICACIÓN (LocalStorage)
-    let db = {
-      agenda: JSON.parse(localStorage.getItem('crm_agenda')) || [],
-      visitas: JSON.parse(localStorage.getItem('crm_visitas')) || [],
-      inventario: JSON.parse(localStorage.getItem('crm_inventario')) || [],
-      finanzas: JSON.parse(localStorage.getItem('crm_finanzas')) || []
+  <!-- MÓDULOS SDK DE FIREBASE (v10) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      signOut, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      deleteDoc, 
+      doc, 
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // CONFIGURACIÓN DE FIREBASE (REEMPLAZAR CON TUS CLAVES)
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROYECTO.firebaseapp.com",
+      projectId: "TU_PROYECTO_ID",
+      storageBucket: "TU_PROYECTO.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
     };
 
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let isLoginMode = true;
+    let localDb = { agenda: [], visitas: [], inventario: [], finanzas: [] };
     let chartInstance = null;
 
-    function init() {
-      // Establecer fechas predeterminadas
+    // --- ESCUCHAR ESTADO DE SESIÓN ---
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('auth-modal').classList.add('hidden');
+        document.getElementById('user-info').innerText = user.email;
+        escucharColecciones();
+      } else {
+        document.getElementById('auth-modal').classList.remove('hidden');
+        document.getElementById('user-info').innerText = 'No autenticado';
+      }
+    });
+
+    // --- AUTENTICACIÓN ---
+    window.toggleAuthMode = function() {
+      isLoginMode = !isLoginMode;
+      document.getElementById('auth-title').innerText = isLoginMode ? 'Iniciar Sesión' : 'Crear Cuenta';
+      document.getElementById('auth-btn-submit').innerText = isLoginMode ? 'Iniciar Sesión' : 'Registrarme';
+      document.getElementById('auth-toggle-text').innerText = isLoginMode ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
+      document.getElementById('auth-toggle-btn').innerText = isLoginMode ? 'Registrarse' : 'Iniciar Sesión';
+    };
+
+    window.ejecutarAuth = async function() {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value.trim();
+
+      if (!email || !password) return alert('Por favor ingresa correo y contraseña.');
+
+      try {
+        if (isLoginMode) {
+          await signInWithEmailAndPassword(auth, email, password);
+        } else {
+          await createUserWithEmailAndPassword(auth, email, password);
+          alert('Cuenta creada exitosamente.');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    };
+
+    window.cerrarSesion = function() {
+      signOut(auth);
+    };
+
+    // --- NAVEGACIÓN DE PESTAÑAS ---
+    window.switchTab = function(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('sidebar-item-active'));
+      document.getElementById(`btn-${tabId}`).classList.add('sidebar-item-active');
+      if(tabId === 'resumen') updateDashboard();
+    };
+
+    // --- LECTURA EN TIEMPO REAL DESDE FIRESTORE ---
+    function escucharColecciones() {
       const hoy = new Date().toISOString().split('T')[0];
       document.getElementById('visita-fecha').value = hoy;
       document.getElementById('fin-fecha').value = hoy;
 
-      renderAgenda();
-      renderVisitas();
-      renderInventario();
-      renderFinanzas();
-      updateDashboard();
-      toggleCamposIngreso();
+      onSnapshot(collection(db, "agenda"), (snapshot) => {
+        localDb.agenda = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+        renderAgenda();
+        updateDashboard();
+      });
+
+      onSnapshot(collection(db, "visitas"), (snapshot) => {
+        localDb.visitas = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+        renderVisitas();
+      });
+
+      onSnapshot(collection(db, "inventario"), (snapshot) => {
+        localDb.inventario = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+        renderInventario();
+      });
+
+      onSnapshot(collection(db, "finanzas"), (snapshot) => {
+        localDb.finanzas = snapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() }));
+        renderFinanzas();
+        updateDashboard();
+      });
     }
 
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-      
-      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('sidebar-item-active'));
-      document.getElementById(`btn-${tabId}`).classList.add('sidebar-item-active');
+    // --- OPERACIONES FIRESTORE (GUARDAR / ELIMINAR) ---
+    window.guardarContacto = async function() {
+      const tipo = document.getElementById('agenda-tipo').value;
+      const nombre = document.getElementById('agenda-nombre').value.trim();
+      const telefono = document.getElementById('agenda-telefono').value.trim();
+      const correo = document.getElementById('agenda-correo').value.trim();
+      const notas = document.getElementById('agenda-notas').value.trim();
 
-      if(tabId === 'resumen') updateDashboard();
-    }
+      if (!nombre) return alert('El nombre es obligatorio.');
 
-    // --- MANEJO DE FINANZAS Y UTILIDADES ---
-    function toggleCamposIngreso() {
+      await addDoc(collection(db, "agenda"), { tipo, nombre, telefono, correo, notas });
+      document.getElementById('agenda-nombre').value = '';
+      document.getElementById('agenda-telefono').value = '';
+      document.getElementById('agenda-correo').value = '';
+      document.getElementById('agenda-notas').value = '';
+    };
+
+    window.eliminarContacto = async function(docId) {
+      await deleteDoc(doc(db, "agenda", docId));
+    };
+
+    window.guardarVisita = async function() {
+      const fecha = document.getElementById('visita-fecha').value;
+      const contacto = document.getElementById('visita-contacto').value;
+      const asunto = document.getElementById('visita-asunto').value.trim();
+      const acuerdos = document.getElementById('visita-acuerdos').value.trim();
+
+      if (!asunto) return alert('Ingresa el asunto.');
+
+      await addDoc(collection(db, "visitas"), { fecha, contacto: contacto || 'Anónimo', asunto, acuerdos });
+      document.getElementById('visita-asunto').value = '';
+      document.getElementById('visita-acuerdos').value = '';
+    };
+
+    window.guardarInventario = async function() {
+      const nombre = document.getElementById('inv-nombre').value.trim();
+      const stock = parseInt(document.getElementById('inv-stock').value);
+      const precio = parseFloat(document.getElementById('inv-precio').value);
+
+      if (!nombre || isNaN(stock) || isNaN(precio)) return alert('Completa los datos.');
+
+      await addDoc(collection(db, "inventario"), { nombre, stock, precio });
+      document.getElementById('inv-nombre').value = '';
+      document.getElementById('inv-stock').value = '';
+      document.getElementById('inv-precio').value = '';
+    };
+
+    window.eliminarInventario = async function(docId) {
+      await deleteDoc(doc(db, "inventario", docId));
+    };
+
+    window.toggleCamposIngreso = function() {
       const tipo = document.getElementById('fin-tipo').value;
       const wrapper = document.getElementById('wrapper-vendedor');
-      if (tipo === 'Gasto') {
-        wrapper.classList.add('hidden');
-      } else {
-        wrapper.classList.remove('hidden');
-      }
-    }
+      if (tipo === 'Gasto') wrapper.classList.add('hidden');
+      else wrapper.classList.remove('hidden');
+    };
 
-    function calcularUtilidad() {
+    window.calcularUtilidad = function() {
       const monto = parseFloat(document.getElementById('fin-monto').value) || 0;
       const pct = parseFloat(document.getElementById('fin-utilidad-pct').value) || 0;
       const utilidadMonto = monto * (pct / 100);
       document.getElementById('lbl-utilidad-monto').innerText = `$${utilidadMonto.toFixed(2)}`;
       return utilidadMonto;
-    }
+    };
 
-    function guardarFinanza() {
+    window.guardarFinanza = async function() {
       const tipo = document.getElementById('fin-tipo').value;
       const fecha = document.getElementById('fin-fecha').value;
       const concepto = document.getElementById('fin-concepto').value.trim();
@@ -378,41 +535,85 @@
       const vendedor = document.getElementById('fin-vendedor').value.trim();
       const pct = parseFloat(document.getElementById('fin-utilidad-pct').value);
 
-      if(!concepto || isNaN(monto) || !fecha) return alert('Por favor completa la fecha, concepto y monto.');
+      if(!concepto || isNaN(monto) || !fecha) return alert('Completa los campos de finanzas.');
 
-      let utilidadCalculada = 0;
-      if (tipo === 'Ingreso') {
-        utilidadCalculada = monto * (pct / 100);
-      }
+      let utilidadCalculada = tipo === 'Ingreso' ? monto * (pct / 100) : 0;
 
-      const registro = {
-        id: Date.now(),
-        fecha: fecha,
-        tipo: tipo,
-        concepto: concepto,
-        monto: monto,
+      await addDoc(collection(db, "finanzas"), {
+        fecha,
+        tipo,
+        concepto,
+        monto,
         vendedor: tipo === 'Ingreso' ? (vendedor || 'N/A') : '-',
         utilidadPct: tipo === 'Ingreso' ? pct : 0,
-        utilidadMonto: tipo === 'Ingreso' ? utilidadCalculada : 0
-      };
+        utilidadMonto: utilidadCalculada
+      });
 
-      db.finanzas.push(registro);
-      localStorage.setItem('crm_finanzas', JSON.stringify(db.finanzas));
-
-      // Limpiar formulario
       document.getElementById('fin-concepto').value = '';
       document.getElementById('fin-monto').value = '';
       document.getElementById('fin-vendedor').value = '';
       calcularUtilidad();
+    };
 
-      renderFinanzas();
-      updateDashboard();
+    // --- RENDERS DE TABLAS ---
+    function renderAgenda() {
+      const tbody = document.getElementById('tabla-agenda');
+      const selectVisita = document.getElementById('visita-contacto');
+      tbody.innerHTML = '';
+      selectVisita.innerHTML = '<option value="">-- Seleccionar --</option>';
+
+      localDb.agenda.forEach(c => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 text-xs font-semibold ${c.tipo === 'Cliente' ? 'text-sky-400' : 'text-purple-400'}">${c.tipo}</td>
+            <td class="p-2 font-medium">${c.nombre}</td>
+            <td class="p-2">${c.telefono}</td>
+            <td class="p-2">${c.correo}</td>
+            <td class="p-2">
+              <button onclick="eliminarContacto('${c.docId}')" class="text-rose-400 hover:underline text-xs">Eliminar</button>
+            </td>
+          </tr>
+        `;
+        selectVisita.innerHTML += `<option value="${c.nombre}">${c.nombre} (${c.tipo})</option>`;
+      });
+    }
+
+    function renderVisitas() {
+      const tbody = document.getElementById('tabla-visitas');
+      tbody.innerHTML = '';
+      localDb.visitas.forEach(v => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 text-xs text-slate-400">${v.fecha}</td>
+            <td class="p-2 font-medium">${v.contacto}</td>
+            <td class="p-2">${v.asunto}</td>
+            <td class="p-2 text-xs text-slate-400">${v.acuerdos}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderInventario() {
+      const tbody = document.getElementById('tabla-inventario');
+      tbody.innerHTML = '';
+      localDb.inventario.forEach(i => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/50">
+            <td class="p-2 font-medium">${i.nombre}</td>
+            <td class="p-2">${i.stock} pza(s)</td>
+            <td class="p-2 font-bold text-emerald-400">$${i.precio.toFixed(2)}</td>
+            <td class="p-2">
+              <button onclick="eliminarInventario('${i.docId}')" class="text-rose-400 hover:underline text-xs">Eliminar</button>
+            </td>
+          </tr>
+        `;
+      });
     }
 
     function renderFinanzas() {
       const tbody = document.getElementById('tabla-finanzas');
       tbody.innerHTML = '';
-      db.finanzas.forEach(f => {
+      localDb.finanzas.forEach(f => {
         const esIngreso = f.tipo === 'Ingreso';
         tbody.innerHTML += `
           <tr class="hover:bg-slate-800/50">
@@ -429,202 +630,59 @@
       });
     }
 
-    // --- AGENDA / CONTACTOS ---
-    function guardarContacto() {
-      const tipo = document.getElementById('agenda-tipo').value;
-      const nombre = document.getElementById('agenda-nombre').value.trim();
-      const telefono = document.getElementById('agenda-telefono').value.trim();
-      const correo = document.getElementById('agenda-correo').value.trim();
-      const notas = document.getElementById('agenda-notas').value.trim();
-
-      if(!nombre) return alert('El nombre es obligatorio.');
-
-      db.agenda.push({ id: Date.now(), tipo, nombre, telefono, correo, notas });
-      localStorage.setItem('crm_agenda', JSON.stringify(db.agenda));
-
-      document.getElementById('agenda-nombre').value = '';
-      document.getElementById('agenda-telefono').value = '';
-      document.getElementById('agenda-correo').value = '';
-      document.getElementById('agenda-notas').value = '';
-
-      renderAgenda();
-      updateDashboard();
-    }
-
-    function renderAgenda() {
-      const tbody = document.getElementById('tabla-agenda');
-      const selectVisita = document.getElementById('visita-contacto');
-      tbody.innerHTML = '';
-      selectVisita.innerHTML = '<option value="">-- Seleccionar --</option>';
-
-      db.agenda.forEach(c => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-800/50">
-            <td class="p-2 text-xs font-semibold ${c.tipo === 'Cliente' ? 'text-sky-400' : 'text-purple-400'}">${c.tipo}</td>
-            <td class="p-2 font-medium">${c.nombre}</td>
-            <td class="p-2">${c.telefono}</td>
-            <td class="p-2">${c.correo}</td>
-            <td class="p-2">
-              <button onclick="eliminarContacto(${c.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button>
-            </td>
-          </tr>
-        `;
-        selectVisita.innerHTML += `<option value="${c.nombre}">${c.nombre} (${c.tipo})</option>`;
-      });
-    }
-
-    function eliminarContacto(id) {
-      db.agenda = db.agenda.filter(c => c.id !== id);
-      localStorage.setItem('crm_agenda', JSON.stringify(db.agenda));
-      renderAgenda();
-      updateDashboard();
-    }
-
-    // --- VISITAS ---
-    function guardarVisita() {
-      const fecha = document.getElementById('visita-fecha').value;
-      const contacto = document.getElementById('visita-contacto').value;
-      const asunto = document.getElementById('visita-asunto').value.trim();
-      const acuerdos = document.getElementById('visita-acuerdos').value.trim();
-
-      if(!asunto) return alert('Ingresa el asunto de la visita.');
-
-      db.visitas.push({ id: Date.now(), fecha, contacto: contacto || 'Anónimo', asunto, acuerdos });
-      localStorage.setItem('crm_visitas', JSON.stringify(db.visitas));
-
-      document.getElementById('visita-asunto').value = '';
-      document.getElementById('visita-acuerdos').value = '';
-
-      renderVisitas();
-    }
-
-    function renderVisitas() {
-      const tbody = document.getElementById('tabla-visitas');
-      tbody.innerHTML = '';
-      db.visitas.forEach(v => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-800/50">
-            <td class="p-2 text-xs text-slate-400">${v.fecha}</td>
-            <td class="p-2 font-medium">${v.contacto}</td>
-            <td class="p-2">${v.asunto}</td>
-            <td class="p-2 text-xs text-slate-400">${v.acuerdos}</td>
-          </tr>
-        `;
-      });
-    }
-
-    // --- INVENTARIO ---
-    function guardarInventario() {
-      const nombre = document.getElementById('inv-nombre').value.trim();
-      const stock = parseInt(document.getElementById('inv-stock').value);
-      const precio = parseFloat(document.getElementById('inv-precio').value);
-
-      if(!nombre || isNaN(stock) || isNaN(precio)) return alert('Completa todos los datos del producto.');
-
-      db.inventario.push({ id: Date.now(), nombre, stock, precio });
-      localStorage.setItem('crm_inventario', JSON.stringify(db.inventario));
-
-      document.getElementById('inv-nombre').value = '';
-      document.getElementById('inv-stock').value = '';
-      document.getElementById('inv-precio').value = '';
-
-      renderInventario();
-    }
-
-    function renderInventario() {
-      const tbody = document.getElementById('tabla-inventario');
-      tbody.innerHTML = '';
-      db.inventario.forEach(i => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-800/50">
-            <td class="p-2 font-medium">${i.nombre}</td>
-            <td class="p-2">${i.stock} pza(s)</td>
-            <td class="p-2 font-bold text-emerald-400">$${i.precio.toFixed(2)}</td>
-            <td class="p-2">
-              <button onclick="eliminarInventario(${i.id})" class="text-rose-400 hover:underline text-xs">Eliminar</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    function eliminarInventario(id) {
-      db.inventario = db.inventario.filter(i => i.id !== id);
-      localStorage.setItem('crm_inventario', JSON.stringify(db.inventario));
-      renderInventario();
-    }
-
-    // --- EXPORTACIÓN CSV PARA EXCEL ---
-    function descargarCSV(contenido, nombreArchivo) {
-      const blob = new Blob(["\uFEFF" + contenido], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", nombreArchivo);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function exportarFinanzasCSV() {
-      if(db.finanzas.length === 0) return alert('No hay datos financieros para exportar.');
-      let csv = 'ID,Fecha,Tipo,Concepto,Vendedor,Monto,Utilidad_Porcentaje,Utilidad_Monto\n';
-      db.finanzas.forEach(f => {
-        csv += `"${f.id}","${f.fecha}","${f.tipo}","${f.concepto}","${f.vendedor || '-'}","${f.monto}","${f.utilidadPct || 0}%","${f.utilidadMonto || 0}"\n`;
-      });
-      descargarCSV(csv, `finanzas_${new Date().toISOString().split('T')[0]}.csv`);
-    }
-
-    function exportarContactosCSV() {
-      if(db.agenda.length === 0) return alert('No hay contactos registrados.');
-      let csv = 'ID,Tipo,Nombre,Telefono,Correo,Notas\n';
-      db.agenda.forEach(c => {
-        csv += `"${c.id}","${c.tipo}","${c.nombre}","${c.telefono}","${c.correo}","${c.notas}"\n`;
-      });
-      descargarCSV(csv, `contactos_${new Date().toISOString().split('T')[0]}.csv`);
-    }
-
-    // --- DASHBOARD Y GRÁFICA ---
+    // --- DASHBOARD Y EXPORTACIONES ---
     function updateDashboard() {
-      const ingresos = db.finanzas.filter(f => f.tipo === 'Ingreso').reduce((a, b) => a + b.monto, 0);
-      const gastos = db.finanzas.filter(f => f.tipo === 'Gasto').reduce((a, b) => a + b.monto, 0);
-      const utilidadTotal = db.finanzas.filter(f => f.tipo === 'Ingreso').reduce((a, b) => a + (b.utilidadMonto || 0), 0);
+      const ingresos = localDb.finanzas.filter(f => f.tipo === 'Ingreso').reduce((a, b) => a + b.monto, 0);
+      const gastos = localDb.finanzas.filter(f => f.tipo === 'Gasto').reduce((a, b) => a + b.monto, 0);
+      const utilidadTotal = localDb.finanzas.filter(f => f.tipo === 'Ingreso').reduce((a, b) => a + (b.utilidadMonto || 0), 0);
 
       document.getElementById('dash-ingresos').innerText = `$${ingresos.toFixed(2)}`;
       document.getElementById('dash-gastos').innerText = `$${gastos.toFixed(2)}`;
       document.getElementById('dash-utilidad').innerText = `$${utilidadTotal.toFixed(2)}`;
-      document.getElementById('dash-contactos').innerText = db.agenda.length;
+      document.getElementById('dash-contactos').innerText = localDb.agenda.length;
 
-      renderChart(ingresos, gastos, utilidadTotal);
-    }
-
-    function renderChart(ingresos, gastos, utilidad) {
       const ctx = document.getElementById('chartFinanzas').getContext('2d');
-      if(chartInstance) chartInstance.destroy();
+      if (chartInstance) chartInstance.destroy();
 
       chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Ingresos Totales', 'Gastos Totales', 'Utilidad Ganada'],
+          labels: ['Ingresos', 'Gastos', 'Utilidad'],
           datasets: [{
-            label: 'Monto en USD/MXN',
-            data: [ingresos, gastos, utilidad],
+            data: [ingresos, gastos, utilidadTotal],
             backgroundColor: ['#34d399', '#f87171', '#fbbf24']
           }]
         },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
-          }
-        }
+        options: { responsive: true, plugins: { legend: { display: false } } }
       });
     }
 
-    // Iniciar al cargar
-    window.onload = init;
+    window.exportarFinanzasCSV = function() {
+      if(localDb.finanzas.length === 0) return alert('Sin datos.');
+      let csv = 'Fecha,Tipo,Concepto,Vendedor,Monto,Utilidad_Pct,Utilidad_Monto\n';
+      localDb.finanzas.forEach(f => {
+        csv += `"${f.fecha}","${f.tipo}","${f.concepto}","${f.vendedor || '-'}","${f.monto}","${f.utilidadPct || 0}%","${f.utilidadMonto || 0}"\n`;
+      });
+      descargarCSV(csv, `finanzas.csv`);
+    };
+
+    window.exportarContactosCSV = function() {
+      if(localDb.agenda.length === 0) return alert('Sin datos.');
+      let csv = 'Tipo,Nombre,Telefono,Correo,Notas\n';
+      localDb.agenda.forEach(c => {
+        csv += `"${c.tipo}","${c.nombre}","${c.telefono}","${c.correo}","${c.notas}"\n`;
+      });
+      descargarCSV(csv, `contactos.csv`);
+    };
+
+    function descargarCSV(contenido, nombreArchivo) {
+      const blob = new Blob(["\uFEFF" + contenido], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = nombreArchivo;
+      link.click();
+    }
   </script>
 </body>
 </html>
